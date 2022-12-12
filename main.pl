@@ -16,37 +16,45 @@ player(player2).
 next_player(player1, player2).
 next_player(player2, player1).
 
-% X -> colunas, Y -> linhas
-valid_move(_, X-Y, X-Y):- !.
-valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_f > Cidx_i,
-                                                  nth0(Lidx_i, Board, Line),
-                                                  nth0(Cidx_f, Line, 'empty'),
-                                                  NewY is Cidx_f-1,
-                                                  valid_move(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
+valid_move_down(_, X-Y, X-Y).
+valid_move_up(_, X-Y, X-Y).
+valid_move_left(_, X-Y, X-Y).
+valid_move_right(_, X-Y, X-Y).
 
-valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_f < Cidx_i,
-                                                  nth0(Lidx_i, Board, Line),
-                                                  nth0(Cidx_f, Line, 'empty'),
-                                                  NewY is Cidx_f+1,
-                                                  valid_move(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
+valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
+                                                        nth0(Cidx_f, Line, empty),
+                                                        NewY is (Cidx_f-1) mod 9,
+                                                        valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
-valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_f < Lidx_i,
-                                                  nth0(Lidx_f, Board, Line),
-                                                  nth0(Cidx_i, Line, 'empty'),
-                                                  NewX is Lidx_f+1,
-                                                  valid_move(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
+valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
+                                                  nth0(Cidx_f, Line, empty),
+                                                  NewY is (Cidx_f+1) mod 9,
+                                                  valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
-valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_f > Lidx_i,
-                                                  nth0(Lidx_f, Board, Line),
-                                                  nth0(Cidx_i, Line, 'empty'),
-                                                  NewX is Lidx_f-1,
-                                                  valid_move(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
+valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line),
+                                                  nth0(Cidx_i, Line, empty),
+                                                  NewX is (Lidx_f+1) mod 9,
+                                                  valid_move_up(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
+
+valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line),
+                                                  nth0(Cidx_i, Line, empty),
+                                                  NewX is (Lidx_f-1) mod 9,
+                                                  valid_move_down(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
+
+valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
+                                                  valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i).
+
+valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
+                                                  valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f).
 
 marble_naming(Player, Marble, Board, Res) :-    append("_", Marble, Suffix),
                                                 append(Player, Suffix, Target),
                                                 maplist(char_code, X, Target),
                                                 atom_chars(Res, X).
 
+get_all_moves(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, (start_board(Board), valid_move(Board, 3-3, L-C)), Res), 
+                                             remove_dups(Res, Deduplicated),
+                                             list_del(Deduplicated, Lidx_i-Cidx_i, Moves).
 get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Board, Res),
                                                           findIndexesBoard(Board, Res, Line-Column).
 
