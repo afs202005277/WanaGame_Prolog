@@ -13,6 +13,9 @@ start_board([[block, block, block, player2_1, empty, player2_2, block, block, bl
 player(player1).
 player(player2).
 
+marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).
+marbles(player2, [player2_1, player2_2, player2_3, player2_4, player2_5, player2_6, player2_7, player2_8]).
+
 next_player(player1, player2).
 next_player(player2, player1).
 
@@ -52,7 +55,7 @@ marble_naming(Player, Marble, Board, Res) :-    append("_", Marble, Suffix),
                                                 maplist(char_code, X, Target),
                                                 atom_chars(Res, X).
 
-get_all_moves(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, (start_board(Board), valid_move(Board, 3-3, L-C)), Res), 
+get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, (start_board(Board), valid_move(Board, 3-3, L-C)), Res), 
                                              remove_dups(Res, Deduplicated),
                                              list_del(Deduplicated, Lidx_i-Cidx_i, Moves).
 get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Board, Res),
@@ -64,12 +67,28 @@ move_marble(Player, Marble, Board, Line-Column, NewBoard):-     get_marble_posit
                                                                 insert_in_board(Board, Res, Line, Column, NB1),
                                                                 insert_in_board(Board, 'empty', L, C, NewBoard).
 
+%                                  (foreach(X,[1,2,3]), foreach(Y,List) do Y is X+3).
+
+get_all_positions(_, [], []).
+get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board, FirstMarble, L-C),
+                                                          get_all_positions(Board, Rest, Res),
+                                                          append([L-C], Res, Positions).
+
+check_all_moves(_, []).
+check_all_moves(Board, [L-C|Tail]):- get_all_moves(Board, L-C, Res),
+                                     \+length(Res, 0),
+                                     check_all_moves(Board, Tail).
+
+game_over(Board, Player):- marbles(Player, MarblesNames),
+                                        get_all_positions(Board, MarblesNames, Positions),
+                                        check_all_moves(Board, Positions).
+
 play_game:- start_board(Board),
             player(Player),
             print_board(Board),
             game_cycle(Board-Player).
 
-game_cycle(Board-Player):- game_over(Board, Winner), !,
+game_cycle(Board-Player):- game_over(Board, Player, Winner), !,
                            congratulate(Winner).
 
 game_cycle(Board-Player):- retrieve_command(Marble, Line-Column),
