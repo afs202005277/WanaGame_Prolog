@@ -36,10 +36,8 @@ valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_f > Lidx_i,
                                                   NewX is Lidx_f-1,
                                                   valid_move(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
 
-all_valid_moves(Moves):- start_board(C),
-                         valid_move(C, 3-3, 2-3).
-
-get_marble_position(Player, Marble, Board, Line-Column):- atom_chars(Player, PlayerStr),
-                                                          append("_", Marble, Suffix),
-                                                          append(PlayerStr, Suffix, Target),
-                                                          findIndexesBoard(Board, Target, Line-Column).
+get_marble_position(Player, Marble, Board, Line-Column):- append("_", Marble, Suffix),
+                                                          append(Player, Suffix, Target),
+                                                          maplist(char_code, Res,Target),
+                                                          atom_chars(X, Res),
+                                                          findIndexesBoard(Board, X, Line-Column).
