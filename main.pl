@@ -11,7 +11,7 @@ start_board([[block, block, block, player2_1, empty, player2_2, block, block, bl
         [block, block, block, player1_1, empty, player1_2, block, block, block]]).
 
 player(player1).
-Player(player2).
+player(player2).
 
 next_player(player1, player2).
 next_player(player2, player1).
