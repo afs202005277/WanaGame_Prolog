@@ -52,13 +52,9 @@ get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, 
 
 move_marble(Player, Marble, Board, Line-Column, NewBoard):-     get_marble_position(Player, Marble, Board, L-C),
                                                                 valid_move(Board, L-C, Line-Column),
-                                                                nth0(Line, Board, BoardLine, BoardWithoutLine),
-                                                                nth0(Column, BoardLine, _, LineWithoutVal),
                                                                 marble_naming(Player, Marble, Board, Res),
-                                                                NewBoard is [Prev, Res, Post],
-                                                                nth0(L, NewBoard, BoardLine),
-                                                                nth0(C, BoardLine, _, [Prev, Post]),
-                                                                NewBoard is [Prev, 'empty', Post].
+                                                                insert_in_board(Board, Res, Line, Column, NB1),
+                                                                insert_in_board(Board, 'empty', L, C, NewBoard).
 
 play_game:- start_board(Board),
             player(Player),
