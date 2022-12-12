@@ -62,7 +62,7 @@ move_marble(Player, Marble, Board, Line-Column, NewBoard):-     get_marble_posit
                                                                 valid_move(Board, L-C, Line-Column),
                                                                 marble_naming(Player, Marble, Board, Res),
                                                                 insert_in_board(Board, Res, Line, Column, NB1),
-                                                                insert_in_board(Board, 'empty', L, C, NewBoard).
+                                                                insert_in_board(NB1, empty, L, C, NewBoard).
 
 play_game:- start_board(Board),
             player(Player),
