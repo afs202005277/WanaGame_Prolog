@@ -22,3 +22,7 @@ retrieve_command(Marble, Line-Column):- write('Which marble you want to move? ')
                          get_char('-'),
                          read_number(Column),
                          get_code(10).
+
+congratulate(Winner):- write(Winner),
+                       write(' won the game!'),
+                       nl.

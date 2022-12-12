@@ -10,6 +10,12 @@ start_board([[block, block, block, player2_1, empty, player2_2, block, block, bl
         [block, block, block, player1_3, empty, player1_4, block, block, block],
         [block, block, block, player1_1, empty, player1_2, block, block, block]]).
 
+player(player1).
+Player(player2).
+
+next_player(player1, player2).
+next_player(player2, player1).
+
 % X -> colunas, Y -> linhas
 valid_move(_, X-Y, X-Y).
 valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_f > Cidx_i,
@@ -41,3 +47,19 @@ get_marble_position(Player, Marble, Board, Line-Column):- append("_", Marble, Su
                                                           maplist(char_code, Res,Target),
                                                           atom_chars(X, Res),
                                                           findIndexesBoard(Board, X, Line-Column).
+
+
+
+play_game:- start_board(Board),
+            player(Player),
+            print_board(Board),
+            game_cycle(Board-Player).
+
+game_cycle(Board-Player):- game_over(Board, Winner), !,
+                           congratulate(Winner).
+
+game_cycle(Board-Player):- retrieve_command(Marble, Line-Column),
+                           move_marble(Board, Move, NewBoard),
+                           next_player(Player, NextPlayer),
+                           print_board(Board-NextPlayer), !,
+                           game_cycle(NewBoard-NextPlayer).
