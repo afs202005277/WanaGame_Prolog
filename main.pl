@@ -11,44 +11,45 @@ start_board([[block, block, block, player2_1, empty, player2_2, block, block, bl
         [block, block, block, player1_1, empty, player1_2, block, block, block]]).
 
 % X -> colunas, Y -> linhas
-valid_move(_, X-Y, X-Y).
+valid_move(_, X-Y, X-Y):- !.
 valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_f > Cidx_i,
                                                   nth0(Lidx_i, Board, Line),
-                                                  nth0(Cidx_f, Line, empty),
+                                                  nth0(Cidx_f, Line, 'empty'),
                                                   NewY is Cidx_f-1,
                                                   valid_move(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
 valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_f < Cidx_i,
                                                   nth0(Lidx_i, Board, Line),
-                                                  nth0(Cidx_f, Line, empty),
+                                                  nth0(Cidx_f, Line, 'empty'),
                                                   NewY is Cidx_f+1,
                                                   valid_move(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
 valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_f < Lidx_i,
                                                   nth0(Lidx_f, Board, Line),
-                                                  nth0(Cidx_i, Line, empty),
+                                                  nth0(Cidx_i, Line, 'empty'),
                                                   NewX is Lidx_f+1,
                                                   valid_move(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
 
 valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_f > Lidx_i,
                                                   nth0(Lidx_f, Board, Line),
-                                                  nth0(Cidx_i, Line, empty),
+                                                  nth0(Cidx_i, Line, 'empty'),
                                                   NewX is Lidx_f-1,
                                                   valid_move(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
 
-marble_naming(Player, Marble, Board, Target) :- atom_chars(Player, PlayerStr),
-                                                append("_", Marble, Suffix),
-                                                append(PlayerStr, Suffix, Target).
+marble_naming(Player, Marble, Board, Res) :-    append("_", Marble, Suffix),
+                                                append(Player, Suffix, Target),
+                                                maplist(char_code, X, Target),
+                                                atom_chars(Res, X).
 
-get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Board, Target),
-                                                          findIndexesBoard(Board, Target, Line-Column).
+get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Board, Res),
+                                                          findIndexesBoard(Board, Res, Line-Column).
 
 move_marble(Player, Marble, Board, Line-Column, NewBoard):-     get_marble_position(Player, Marble, Board, L-C),
                                                                 valid_move(Board, L-C, Line-Column),
-                                                                nth0(Line, Board, BoardLine),
-                                                                nth0(Column, BoardLine, _, [Prev, Post]),
-                                                                marble_naming(Player, Marble, Board, Target),
-                                                                NewBoard is [Prev, Target, Post],
+                                                                nth0(Line, Board, BoardLine, BoardWithoutLine),
+                                                                nth0(Column, BoardLine, _, LineWithoutVal),
+                                                                marble_naming(Player, Marble, Board, Res),
+                                                                NewBoard is [Prev, Res, Post],
                                                                 nth0(L, NewBoard, BoardLine),
                                                                 nth0(C, BoardLine, _, [Prev, Post]),
                                                                 NewBoard is [Prev, 'empty', Post].
