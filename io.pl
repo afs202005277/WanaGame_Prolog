@@ -1,17 +1,19 @@
 print_line([]):- nl.
-print_line([block|Rest]):- write('      '),
+print_line([block|Rest]):- write('\t\t'),
                            print_line(Rest).
 
 print_line([empty|Rest]):- write(empty),
-                           write('    '),
+                           write('       \t'),
                            print_line(Rest).
                            
 print_line([First|Rest]):- write(First),
-                           put_char(' '),
+                           write('   '),
+                           put_char('\t'),
                            print_line(Rest).
 
 print_board([]):-nl.
 print_board([FirstLine|Rest]):- print_line(FirstLine),
+                                put_char('\n'),
                                 print_board(Rest).
 
 retrieve_command(Marble, Line-Column):- write('Which marble you want to move? '),
