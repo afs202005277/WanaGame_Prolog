@@ -19,8 +19,8 @@ test_board([[block, block, block, player2_1, empty, player2_2, block, block, blo
         [empty, empty, empty, empty, empty, empty, empty, empty, empty],
         [empty, empty, empty, player1_7, empty, player1_8, empty, empty, empty],
         [block, block, block, player1_5, empty, player1_6, block, block, block],
-        [block, block, block, player1_3, block, player1_4, block, block, block],
-        [block, block, block, player1_1, empty, player1_2, block, block, block]]).
+        [block, block, block, player1_3, empty, player1_4, block, block, block],
+        [block, block, block, empty, player1_1, player1_2, block, block, block]]).
 
 player(player1).
 player(player2).
@@ -100,17 +100,21 @@ game_over(Board, Player):- marbles(Player, MarblesNames),
                            get_all_positions(Board, MarblesNames, Positions),
                            \+check_all_moves(Board, Positions).
 
-play_game:- start_board(Board),
+play_game:- test_board(Board),
             player(Player),
             print_board(Board),
-            game_cycle(Board-Player).
+            start_menu(GameMode),
+            game_cycle(GameMode, Board-Player).
 
-game_cycle(Board-Player):- game_over(Board, Player), !,
+game_cycle(_, Board-Player):- game_over(Board, Player), !,
                            next_player(Player, NextPlayer),
                            congratulate(NextPlayer).
 
-game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
+game_cycle(hVh, Board-Player):- retrieve_command(Player, Marble, Line-Column),
                            move_marble(Player, Marble, Board, Line-Column, NewBoard),
                            next_player(Player, NextPlayer),
                            print_board(NewBoard),
-                           game_cycle(NewBoard-NextPlayer).
+                           game_cycle(hVh, NewBoard-NextPlayer).
+
+game_cycle(hVc, Board-Player):- write('Not implemented yet!'), nl.
+game_cycle(cVc, Board-Player):- write('Not implemented yet!'), nl.

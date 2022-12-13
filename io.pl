@@ -1,8 +1,8 @@
 print_line([]):- nl.
-print_line([block|Rest]):- print_formatted('     ', 9),
+print_line([block|Rest]):- print_formatted('     ', 11),
                            print_line(Rest).
                            
-print_line([First|Rest]):- print_formatted(First, 9),
+print_line([First|Rest]):- print_formatted(First, 11),
                            print_line(Rest).
 
 print_board([], _):-nl.
@@ -47,7 +47,7 @@ retrieve_command(Player, Marble, Line-Column):- write(Player), write(' it is you
                          read_number(Column),
                          get_code(10).
 
-initial_menu(GameMode):- write('Greetings! This is our implementation of the Wana game.\n'),
+start_menu(GameMode):- write('Greetings! This is our implementation of the Wana game.\n'),
                          write('We offer you different game modes, namely:\n'),
                          write('1- Multiplayer mode (human vs human)\n'),
                          write('2- Human vs Computer\n'),
@@ -58,6 +58,21 @@ initial_menu(GameMode):- write('Greetings! This is our implementation of the Wan
                          get_code(10),
                          (\+gamemode(Option, GameMode) -> write('Invalid Option! Your choice must be one of 1, 2 or 3: '), fail; \+fail).
 
-congratulate(Winner):- write(Winner),
-                       write(' won the game!'),
-                       nl.
+% https://textkool.com/en/ascii-art-generator?hl=default&vl=default&font=Big&text=Player%201%20Won%20%20%20!!
+congratulate(player1):- write('  _____  _                         __  __          __             _ _ '),nl,
+                     write(' |  __ \\| |                       /_ | \\ \\        / /            | | |'),nl,
+                     write(' | |__) | | __ _ _   _  ___ _ __   | |  \\ \\  /\\  / /__  _ __     | | |'),nl,
+                     write(' |  ___/| |/ _` | | | |/ _ \\ \'__|  | |   \\ \\/  \\/ / _ \\| \'_ \\    | | |'),nl,
+                     write(' | |    | | (_| | |_| |  __/ |     | |    \\  /\\  / (_) | | | |   |_|_|'),nl,
+                     write(' |_|    |_|\\__,_|\\__, |\\___|_|     |_|     \\/  \\/ \\___/|_| |_|   (_|_)'),nl,
+                     write('                  __/ |                                               '),nl,
+                     write('                 |___/                                                '),nl.
+
+congratulate(player2):- write('  _____  _                         ___   __          __             _ _ '),nl,
+write(' |  __ \\| |                       |__ \\  \\ \\        / /            | | |'),nl,
+write(' | |__) | | __ _ _   _  ___ _ __     ) |  \\ \\  /\\  / /__  _ __     | | |'),nl,
+write(' |  ___/| |/ _` | | | |/ _ \\ \'__|   / /    \\ \\/  \\/ / _ \\| \'_ \\    | | |'),nl,
+write(' | |    | | (_| | |_| |  __/ |     / /_     \\  /\\  / (_) | | | |   |_|_|'),nl,
+write(' |_|    |_|\\__,_|\\__, |\\___|_|    |____|     \\/  \\/ \\___/|_| |_|   (_|_)'),nl,
+write('                  __/ |                                                 '),nl,
+write('                 |___/                                                  '),nl.
