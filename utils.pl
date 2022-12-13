@@ -49,3 +49,6 @@ insert_in_board(Board, Val, X, Y, NewBoard) :-  X < 9,
                                                 list_slice(BoardWithoutLine, X1, PrevBoard, AfterBoard),
                                                 append(PrevBoard, [NewLine], Tmp2),
                                                 append(Tmp2, AfterBoard, NewBoard).
+
+atom_string(Atom, String):- maplist(char_code, Target, String),
+                            atom_chars(Atom, Target).

@@ -52,8 +52,7 @@ valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- valid_move_left(Board, Lidx_i-
 
 marble_naming(Player, Marble, Board, Res) :-    append("_", Marble, Suffix),
                                                 append(Player, Suffix, Target),
-                                                maplist(char_code, X, Target),
-                                                atom_chars(Res, X).
+                                                atom_string(Res, Target).
 
 get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, (start_board(Board), valid_move(Board, 3-3, L-C)), Res), 
                                              remove_dups(Res, Deduplicated),
@@ -75,13 +74,13 @@ get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board
                                                           append([L-C], Res, Positions).
 
 check_all_moves(_, []).
-check_all_moves(Board, [L-C|Tail]):- get_all_moves(Board, L-C, Res),
+check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),
                                      \+length(Res, 0),
                                      check_all_moves(Board, Tail).
 
 game_over(Board, Player):- marbles(Player, MarblesNames),
-                                        get_all_positions(Board, MarblesNames, Positions),
-                                        check_all_moves(Board, Positions).
+                           get_all_positions(Board, MarblesNames, Positions),
+                           check_all_moves(Board, Positions).
 
 play_game:- start_board(Board),
             player(Player),
@@ -91,8 +90,11 @@ play_game:- start_board(Board),
 game_cycle(Board-Player):- game_over(Board, Player), !,
                            congratulate(Winner).
 
-game_cycle(Board-Player):- retrieve_command(Marble, Line-Column),
+game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
+                           write('adeus'),
                            move_marble(Player, Marble, Board, Line-Column, NewBoard),
+                           write('teste'),
                            next_player(Player, NextPlayer),
+                           write('ola'),
                            print_board(NewBoard),
                            game_cycle(NewBoard-NextPlayer).

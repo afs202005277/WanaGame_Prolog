@@ -16,7 +16,9 @@ print_board([FirstLine|Rest]):- print_line(FirstLine),
                                 put_char('\n'),
                                 print_board(Rest).
 
-retrieve_command(Marble, Line-Column):- write('Which marble you want to move? '),
+retrieve_command(Player, Marble, Line-Column):- write(Player), write(' it is your turn!'),
+                                                nl,
+                         write('Which marble you want to move? '),
                          read_number(Marble),
                          get_code(10),
                          write('Where do you want to move it? [Line-Column] '),
