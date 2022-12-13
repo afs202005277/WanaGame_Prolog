@@ -110,24 +110,29 @@ game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
 
 
 
-
+get_all_moves_from_all_pos(Board, [], []).
 get_all_moves_from_all_pos(Board, [L-C|Rest], Moves):-  get_all_moves_from_pos(Board, L-C, M1), 
                                                         write(L),
                                                         get_all_moves_from_all_pos(Board, Rest, M2), 
                                                         append([M1], M2, Moves).
 
-choose_from_list([A|Rest], 0, RetList):- RetList is A.
-choose_from_list([A|Rest], X, RetList):- X1 is X-1, choose_from_list(Rest, X1, RetList).
+choose_from_list([], _, []).
+choose_from_list([A|Rest], 0, A).
+choose_from_list([A|Rest], X, RetList):- length(Rest, S), Size is S+1, X<Size, X>0, X1 is X-1, choose_from_list(Rest, X1, RetList).
 
 best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
                                                                 get_all_positions(Board, MarblesNames, Positions),
                                                                 get_all_moves_from_all_pos(Board, Positions, Moves),
-                                                                length(Positions, LP1),
+                                                                length(Moves, LP1),
                                                                 LenPos is LP1-1,
                                                                 random(0, LenPos, N1),
-                                                                choose_from_list(Positions, N1, Ins),
+                                                                choose_from_list(Moves, N1, Ins),
                                                                 length(Ins, LP2),
                                                                 LenIns is LP2-1,
-                                                                random(0, LenIns, N2),
+                                                                (       LenIns =:= 0 ->
+                                                                                N2 = 0
+                                                                ;       otherwise ->
+                                                                                random(0, LenIns, N2)
+                                                                ),
                                                                 choose_from_list(Ins, N2, LineMove-ColumnMove),
                                                                 choose_from_list(MarblesNames, N1, Marble).
