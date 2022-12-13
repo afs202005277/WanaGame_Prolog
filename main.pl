@@ -24,6 +24,10 @@ test_board([[block, block, block, player2_1, empty, player2_2, block, block, blo
 
 player(player1).
 player(player2).
+
+gamemode(1, hVh).
+gamemode(2, hVc).
+gamemode(3, cvc).
 size(9).
 
 marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).

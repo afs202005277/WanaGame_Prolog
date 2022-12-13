@@ -47,6 +47,17 @@ retrieve_command(Player, Marble, Line-Column):- write(Player), write(' it is you
                          read_number(Column),
                          get_code(10).
 
+initial_menu(GameMode):- write('Greetings! This is our implementation of the Wana game.\n'),
+                         write('We offer you different game modes, namely:\n'),
+                         write('1- Multiplayer mode (human vs human)\n'),
+                         write('2- Human vs Computer\n'),
+                         write('3- Computer vs Computer\n\n'),
+                         write('Please choose a game mode: '),
+                         repeat,
+                         read_number(Option),
+                         get_code(10),
+                         (\+gamemode(Option, GameMode) -> write('Invalid Option! Your choice must be one of 1, 2 or 3: '), fail; \+fail).
+
 congratulate(Winner):- write(Winner),
                        write(' won the game!'),
                        nl.
