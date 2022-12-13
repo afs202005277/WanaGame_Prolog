@@ -1,0 +1,6 @@
+1- Fazer modo Pessoa vs PC
+2- Fazer modo PC vs PC 
+3- Melhorar design do board
+4- tentar corrigir o facto de sempre q se quer fazer um move, o user tem de contar o número de linhas e colunas
+5- Menu para escolha de modos de jogo
+6- melhorar gameover screen
