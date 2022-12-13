@@ -79,7 +79,7 @@ get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, 
                                                           findIndexesBoard(Board, Res, Line-Column).
 
 move_marble(Marble, Board, L-C, Line-Column, NewBoard):- insert_in_board(Board, Marble, Line, Column, NB1),
-                                                            insert_in_board(NB1, empty, L, C, NewBoard).
+                                                         insert_in_board(NB1, empty, L, C, NewBoard).
 
 get_all_positions(_, [], []).
 get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board, FirstMarble, L-C),
@@ -107,6 +107,7 @@ game_cycle(_, Board-Player):- game_over(Board, Player), !,
 
 make_move(Player, Board, NewBoard):- repeat,
                                      retrieve_command(Player, Marble, LineDest-ColumnDest),
+                                     write(LineDest-ColumnDest), nl,
                                      write('OLA1\n'),
                                      atom_string(Player, PlayerString),
                                      write(PlayerString),nl,
@@ -114,10 +115,11 @@ make_move(Player, Board, NewBoard):- repeat,
                                      write(MarbleString),nl,
                                      get_marble_position(PlayerString, MarbleString, Board, L-C),
                                      write(L-C), nl,
-                                     valid_move(Board, L-C, LineDest-ColumnDest),!,
+                                     valid_move(Board, L-C, LineDest-ColumnDest),
                                      write('OLA5\n'),
                                      marble_naming(PlayerString, MarbleString, Res),
-                                     move_marble(Res, Board, L-C, Line-Column, NewBoard).
+                                     write('OLA6\n'),
+                                     move_marble(Res, Board, L-C, LineDest-ColumnDest, NewBoard).
 
 game_cycle(hVh, Board-Player):- make_move(Player, Board, NewBoard),
                            next_player(Player, NextPlayer),

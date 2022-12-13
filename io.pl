@@ -21,6 +21,12 @@ print_board(Board):- size(Size),
                      print_board(Board, 0),
                      print_line(Indexes).
 
+print_n(_, 0).
+print_n(S, N):- N>0,
+                write(S),
+                N1 is N-1,
+                print_n(S, N1).
+
 print_text(TextAtom, Padding):- print_n(' ', Padding),
                                 write(TextAtom),
                                 print_n(' ', Padding).
