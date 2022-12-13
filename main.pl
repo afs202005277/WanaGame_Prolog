@@ -112,8 +112,9 @@ game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
 
 
 get_all_moves_from_all_pos(Board, [L-C|Rest], Moves):-  get_all_moves_from_pos(Board, L-C, M1), 
+                                                        write(L),
                                                         get_all_moves_from_all_pos(Board, Rest, M2), 
-                                                        append([M1], [M2], Moves).
+                                                        append([M1], M2, Moves).
 
 choose_from_list([A|Rest], 0, RetList):- RetList is A.
 choose_from_list([A|Rest], X, RetList):- X1 is X-1, choose_from_list(Rest, X1, RetList).
