@@ -78,13 +78,8 @@ get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, valid_move(Bo
 get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Res),
                                                           findIndexesBoard(Board, Res, Line-Column).
 
-move_marble(Player, Marble, Board, Line-Column, NewBoard):- atom_string(Player, PlayerString),
-                                                                        atom_string_number(Marble, MarbleString),
-                                                                        get_marble_position(PlayerString, MarbleString, Board, L-C),
-                                                                        valid_move(Board, L-C, Line-Column),
-                                                                        marble_naming(PlayerString, MarbleString, Res),
-                                                                        insert_in_board(Board, Res, Line, Column, NB1),
-                                                                        insert_in_board(NB1, empty, L, C, NewBoard).
+move_marble(Marble, Board, L-C, Line-Column, NewBoard):- insert_in_board(Board, Marble, Line, Column, NB1),
+                                                            insert_in_board(NB1, empty, L, C, NewBoard).
 
 get_all_positions(_, [], []).
 get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board, FirstMarble, L-C),
@@ -100,7 +95,7 @@ game_over(Board, Player):- marbles(Player, MarblesNames),
                            get_all_positions(Board, MarblesNames, Positions),
                            \+check_all_moves(Board, Positions).
 
-play_game:- test_board(Board),
+play_game:- start_board(Board),
             player(Player),
             print_board(Board),
             start_menu(GameMode),
@@ -110,8 +105,21 @@ game_cycle(_, Board-Player):- game_over(Board, Player), !,
                            next_player(Player, NextPlayer),
                            congratulate(NextPlayer).
 
-game_cycle(hVh, Board-Player):- retrieve_command(Player, Marble, Line-Column),
-                           move_marble(Player, Marble, Board, Line-Column, NewBoard),
+make_move(Player, Board, NewBoard):- repeat,
+                                     retrieve_command(Player, Marble, LineDest-ColumnDest),
+                                     write('OLA1\n'),
+                                     atom_string(Player, PlayerString),
+                                     write(PlayerString),nl,
+                                     atom_string_number(Marble, MarbleString),
+                                     write(MarbleString),nl,
+                                     get_marble_position(PlayerString, MarbleString, Board, L-C),
+                                     write(L-C), nl,
+                                     valid_move(Board, L-C, LineDest-ColumnDest),!,
+                                     write('OLA5\n'),
+                                     marble_naming(PlayerString, MarbleString, Res),
+                                     move_marble(Res, Board, L-C, Line-Column, NewBoard).
+
+game_cycle(hVh, Board-Player):- make_move(Player, Board, NewBoard),
                            next_player(Player, NextPlayer),
                            print_board(NewBoard),
                            game_cycle(hVh, NewBoard-NextPlayer).
