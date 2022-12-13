@@ -57,16 +57,17 @@ marble_naming(Player, Marble, Board, Res) :-    append("_", Marble, Suffix),
 get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, (start_board(Board), valid_move(Board, 3-3, L-C)), Res), 
                                              remove_dups(Res, Deduplicated),
                                              list_del(Deduplicated, Lidx_i-Cidx_i, Moves).
+
 get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Board, Res),
                                                           findIndexesBoard(Board, Res, Line-Column).
 
-move_marble(Player, Marble, Board, Line-Column, NewBoard):-     get_marble_position(Player, Marble, Board, L-C),
-                                                                valid_move(Board, L-C, Line-Column),
-                                                                marble_naming(Player, Marble, Board, Res),
-                                                                insert_in_board(Board, Res, Line, Column, NB1),
-                                                                insert_in_board(NB1, empty, L, C, NewBoard).
-
-%                                  (foreach(X,[1,2,3]), foreach(Y,List) do Y is X+3).
+move_marble(Player, Marble, Board, Line-Column, NewBoard):- atom_string(Player, PlayerString),
+                                                                        atom_string_number(Marble, MarbleString),
+                                                                        get_marble_position(PlayerString, MarbleString, Board, L-C),
+                                                                        valid_move(Board, L-C, Line-Column),
+                                                                        marble_naming(PlayerString, MarbleString, Board, Res),
+                                                                        insert_in_board(Board, Res, Line, Column, NB1),
+                                                                        insert_in_board(NB1, empty, L, C, NewBoard).
 
 get_all_positions(_, [], []).
 get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board, FirstMarble, L-C),
