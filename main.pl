@@ -1,4 +1,4 @@
-:-use_module(library(lists)).
+:-use_module(library(lists)), use_module(library(random)).
 :- ['io.pl', 'utils.pl'].
 start_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
@@ -98,3 +98,26 @@ game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
                            write('ola'),
                            print_board(NewBoard),
                            game_cycle(NewBoard-NextPlayer).
+
+
+
+
+get_all_moves_from_all_pos(Board, [L-C|Rest], Moves):-  get_all_moves_from_pos(Board, L-C, M1), 
+                                                        get_all_moves_from_all_pos(Board, Rest, M2), 
+                                                        append([M1], [M2], Moves).
+
+choose_from_list([A|Rest], 0, RetList):- RetList is A.
+choose_from_list([A|Rest], X, RetList):- X1 is X-1, choose_from_list(Rest, X1, RetList).
+
+best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
+                                                                get_all_positions(Board, MarblesNames, Positions),
+                                                                get_all_moves_from_all_pos(Board, Positions, Moves),
+                                                                length(Positions, LP1),
+                                                                LenPos is LP1-1,
+                                                                random(0, LenPos, N1),
+                                                                choose_from_list(Positions, N1, Ins),
+                                                                length(Ins, LP2),
+                                                                LenIns is LP2-1,
+                                                                random(0, LenIns, N2),
+                                                                choose_from_list(Ins, N2, LineMove-ColumnMove),
+                                                                choose_from_list(MarblesNames, N1, Marble).
