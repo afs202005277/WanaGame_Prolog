@@ -6,19 +6,20 @@ print_line([First|Rest]):- print_formatted(First, 9),
                            print_line(Rest).
 
 print_board([], _):-nl.
-print_board([FirstLine|Rest], LineIndex):- write('\t'),
-                                print_line(FirstLine),
-                                write('\t'),
-                                put_char('\n'),
-                                NewIdx is LineIndex+1,
-                                print_board(Rest, NewIdx).
+print_board([FirstLine|Rest], LineIndex):- append([LineIndex], FirstLine, Tmp),
+                                           append(Tmp, [LineIndex], Res),
+                                           print_line(Res),
+                                           nl,
+                                           NewIdx is LineIndex+1,
+                                           print_board(Rest, NewIdx).
 
 print_board(Board):- size(Size),
                      Max is Size-1,
                      numlist(0, Max, L),
-                     print_line(L),
+                     append([' '], L, Indexes),
+                     print_line(Indexes),
                      print_board(Board, 0),
-                     print_line(L).
+                     print_line(Indexes).
 
 print_text(TextAtom, Padding):- print_n(' ', Padding),
                                 write(TextAtom),
