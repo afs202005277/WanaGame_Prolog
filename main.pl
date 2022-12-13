@@ -1,4 +1,6 @@
 :-use_module(library(lists)).
+:-use_module(library(between)).
+
 :- ['io.pl', 'utils.pl'].
 start_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
@@ -22,6 +24,7 @@ test_board([[block, block, block, player2_1, empty, player2_2, block, block, blo
 
 player(player1).
 player(player2).
+size(9).
 
 marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).
 marbles(player2, [player2_1, player2_2, player2_3, player2_4, player2_5, player2_6, player2_7, player2_8]).
