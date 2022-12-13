@@ -50,5 +50,13 @@ insert_in_board(Board, Val, X, Y, NewBoard) :-  X < 9,
                                                 append(PrevBoard, [NewLine], Tmp2),
                                                 append(Tmp2, AfterBoard, NewBoard).
 
+atom_string_number(Number, String):- Number >= 0,
+                              Number < 10,
+                              Code is Number+48,
+                              append([], [Code], String).
+
 atom_string(Atom, String):- maplist(char_code, Target, String),
                             atom_chars(Atom, Target).
+
+atom_string(Atom, String):- atom_chars(Atom, Res),
+                            maplist(char_code, Res, String).
