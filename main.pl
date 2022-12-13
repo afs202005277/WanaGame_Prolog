@@ -88,11 +88,11 @@ play_game:- start_board(Board),
             print_board(Board),
             game_cycle(Board-Player).
 
-game_cycle(Board-Player):- game_over(Board, Player, Winner), !,
+game_cycle(Board-Player):- game_over(Board, Player), !,
                            congratulate(Winner).
 
 game_cycle(Board-Player):- retrieve_command(Marble, Line-Column),
-                           move_marble(Board, Move, NewBoard),
+                           move_marble(Player, Marble, Board, Line-Column, NewBoard),
                            next_player(Player, NextPlayer),
-                           print_board(Board-NextPlayer), !,
+                           print_board(NewBoard),
                            game_cycle(NewBoard-NextPlayer).
