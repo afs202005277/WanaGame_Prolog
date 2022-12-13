@@ -10,6 +10,16 @@ start_board([[block, block, block, player2_1, empty, player2_2, block, block, bl
         [block, block, block, player1_3, empty, player1_4, block, block, block],
         [block, block, block, player1_1, empty, player1_2, block, block, block]]).
 
+test_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
+        [block, block, block, player2_3, empty, player2_4, block, block, block],
+        [block, block, block, player2_5, empty, player2_6, block, block, block],
+        [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
+        [empty, empty, empty, empty, empty, empty, empty, empty, empty],
+        [empty, empty, empty, player1_7, empty, player1_8, empty, empty, empty],
+        [block, block, block, player1_5, empty, player1_6, block, block, block],
+        [block, block, block, player1_3, block, player1_4, block, block, block],
+        [block, block, block, player1_1, empty, player1_2, block, block, block]]).
+
 player(player1).
 player(player2).
 
@@ -54,7 +64,7 @@ marble_naming(Player, Marble, Board, Res) :-    append("_", Marble, Suffix),
                                                 append(Player, Suffix, Target),
                                                 atom_string(Res, Target).
 
-get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, (start_board(Board), valid_move(Board, 3-3, L-C)), Res), 
+get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, valid_move(Board, Lidx_i-Cidx_i, L-C), Res), 
                                              remove_dups(Res, Deduplicated),
                                              list_del(Deduplicated, Lidx_i-Cidx_i, Moves).
 
@@ -81,7 +91,7 @@ check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),
 
 game_over(Board, Player):- marbles(Player, MarblesNames),
                            get_all_positions(Board, MarblesNames, Positions),
-                           check_all_moves(Board, Positions).
+                           \+check_all_moves(Board, Positions).
 
 play_game:- start_board(Board),
             player(Player),
@@ -89,13 +99,11 @@ play_game:- start_board(Board),
             game_cycle(Board-Player).
 
 game_cycle(Board-Player):- game_over(Board, Player), !,
-                           congratulate(Winner).
+                           next_player(Player, NextPlayer),
+                           congratulate(NextPlayer).
 
 game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
-                           write('adeus'),
                            move_marble(Player, Marble, Board, Line-Column, NewBoard),
-                           write('teste'),
                            next_player(Player, NextPlayer),
-                           write('ola'),
                            print_board(NewBoard),
                            game_cycle(NewBoard-NextPlayer).
