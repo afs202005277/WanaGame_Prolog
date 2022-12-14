@@ -60,3 +60,6 @@ atom_string(Atom, String):- maplist(char_code, Target, String),
 
 atom_string(Atom, String):- atom_chars(Atom, Res),
                             maplist(char_code, Res, String).
+
+max_list(L, M, I) :- nth0(I, L, M), \+ (member(E, L), E > M).
+min_list(L, M, I) :- nth0(I, L, M), \+ (member(E, L), E < M).
