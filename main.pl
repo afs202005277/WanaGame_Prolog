@@ -196,6 +196,7 @@ sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-    depthMin
                                                                         sublistDepthMinimaxCalls(Rest, Player, Depth, 1, MLCs2, Scores2),
                                                                         append([S1], Scores2, Scores),
                                                                         append([MLC1], MLCs2, MLCs).
+
 sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 0, MLCs1, Scores1),
                                                                         sousaAndre(Scores1, MLCs1, S1, MLC1),
                                                                         sublistDepthMinimaxCalls(Rest, Player, Depth, 0, MLCs2, Scores2),
