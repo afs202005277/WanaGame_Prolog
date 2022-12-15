@@ -63,3 +63,9 @@ atom_string(Atom, String):- atom_chars(Atom, Res),
 
 max_list(L, M, I) :- nth0(I, L, M), \+ (member(E, L), E > M).
 min_list(L, M, I) :- nth0(I, L, M), \+ (member(E, L), E < M).
+
+del_all(_, [], []).
+del_all(Elem, [Elem|T1], List2):-del_all(Elem, T1, List2).
+del_all(Elem, [H1|T1], List2):-Elem\==H1,
+                               del_all(Elem, T1, Res),
+                               append([H1], Res, List2).

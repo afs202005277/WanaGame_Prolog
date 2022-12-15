@@ -184,47 +184,53 @@ depthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-   minimax(A, Playe
                                                                 append([M-LM-CM], TmpMLCs, MLCs),
                                                                 append([S1], TmpScores, Scores).
 
+andreSousa([], [], -100000000, player1_1-2-2).
+andreSousa(Scores1, MLCs1, S1, MLC1):- max_list(Scores1, S1, I1), nth0(I1, MLCs1, MLC1).
+
+sousaAndre([], [], 100000000, player2_1-2-2).
+sousaAndre(Scores1, MLCs1, S1, MLC1):- min_list(Scores1, S1, I1), nth0(I1, MLCs1, MLC1).
+
 sublistDepthMinimaxCalls([], _, _, _, [], []).
 sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 1, MLCs1, Scores1),
-                                                                        max_list(Scores1, S1, I1),
-                                                                        nth0(I1, MLCs1, MLC1),
+                                                                        andreSousa(Scores1, MLCs1, S1, MLC1),
                                                                         sublistDepthMinimaxCalls(Rest, Player, Depth, 1, MLCs2, Scores2),
                                                                         append([S1], Scores2, Scores),
                                                                         append([MLC1], MLCs2, MLCs).
 sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 0, MLCs1, Scores1),
-                                                                        min_list(Scores1, S1, I1),
-                                                                        nth0(I1, MLCs1, MLC1),
+                                                                        sousaAndre(Scores1, MLCs1, S1, MLC1),
                                                                         sublistDepthMinimaxCalls(Rest, Player, Depth, 0, MLCs2, Scores2),
                                                                         append([S1], Scores2, Scores),
                                                                         append([MLC1], MLCs2, MLCs).
 
 
-minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      write('loop11'), marbles(Player, MarblesPlayer),
-                                                                        write('loop12'), get_all_positions(Board, MarblesPlayer, PositionsPlayer),
-                                                                        write('loop13'), get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
-                                                                        write('loop14'), all_boards(Board, Player, MarblesPlayer, MovesPlayer, NewBoards),
-                                                                        write('loop15'), sublistBestEvaluationScore(NewBoards, Player, TmpScores, Is),
-                                                                        write('loop16'), max_list(TmpScores, Score, I),
-                                                                        write('loop17'), nth0(I, MarblesPlayer, Marble),
-                                                                        write('loop18'), nth0(I, Is, TmpI),
-                                                                        write('loop19'), nth0(I, MovesPlayer, TmpMoves),
-                                                                        write('loop10'), nth0(TmpI, TmpMoves, LineMove-ColumnMove).
+minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      write(0), nl, marbles(Player, MarblesPlayer),
+                                                                        get_all_positions(Board, MarblesPlayer, PositionsPlayer),
+                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
+                                                                        all_boards(Board, Player, MarblesPlayer, MP, NewBoards),
+                                                                        del_all([], MP, MovesPlayer),
+                                                                        sublistBestEvaluationScore(NewBoards, Player, TmpScores, Is),
+                                                                        max_list(TmpScores, Score, I),
+                                                                        nth0(I, MarblesPlayer, Marble),
+                                                                        nth0(I, Is, TmpI),
+                                                                        nth0(I, MovesPlayer, TmpMoves),
+                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
 
-minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      write('loop21'), next_player(Player, OpponentPlayer),
-                                                                        write('loop22'), marbles(OpponentPlayer, MarblesOpponentPlayer),
-                                                                        write('loop23'), get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
-                                                                        write('loop24'), get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MovesOpponentPlayer),
-                                                                        write('loop25'), all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MovesOpponentPlayer, NewBoards),
-                                                                        write('loop26'), sublistBestEvaluationScore(NewBoards, Player, TmpScores, Is),
-                                                                        write('loop27'), min_list(TmpScores, Score, I),
-                                                                        write('loop28'), nth0(I, MarblesOpponentPlayer, Marble),
-                                                                        write('loop29'), nth0(I, Is, TmpI),
-                                                                        write('loop20'), nth0(I, MovesOpponentPlayer, TmpMoves),
-                                                                        write('loop2a'), nth0(TmpI, TmpMoves, LineMove-ColumnMove). 
+minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      write(0), nl, next_player(Player, OpponentPlayer),
+                                                                        marbles(OpponentPlayer, MarblesOpponentPlayer),
+                                                                        get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
+                                                                        get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MOP),
+                                                                        all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MOP, NewBoards),
+                                                                        del_all([], MOP, MovesOpponentPlayer),
+                                                                        sublistBestEvaluationScore(NewBoards, Player, TmpScores, Is),
+                                                                        min_list(TmpScores, Score, I),
+                                                                        nth0(I, MarblesOpponentPlayer, Marble),
+                                                                        nth0(I, Is, TmpI),
+                                                                        nth0(I, MovesOpponentPlayer, TmpMoves),
+                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
 
-minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  write('loop3'), write(' '), write(Depth), write('\n'), marbles(Player, MarblesPlayer),
+minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  write(Depth), nl, marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
                                                                         all_boards(Board, Player, MarblesPlayer, MovesPlayer, NewBoards),
@@ -233,7 +239,8 @@ minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  write('l
                                                                         max_list(Scores, Score, I),
                                                                         nth0(I, MLCs, Marble-LineMove-ColumnMove).
 
-minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  write('loop4'), write(' '), write(Depth), write('\n'), next_player(Player, OpponentPlayer),
+
+minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  write(Depth), nl, next_player(Player, OpponentPlayer),
                                                                         marbles(OpponentPlayer, MarblesOpponentPlayer),
                                                                         get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MovesOpponentPlayer),
@@ -245,3 +252,5 @@ minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  write('l
 
 
 best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 3, 0, Marble, LineMove-ColumnMove, _).
+
+% reconsult('main.pl'), start_board(Board), best_move_ai(1, Board, player1, M, L-C).
