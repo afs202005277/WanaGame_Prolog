@@ -4,4 +4,4 @@
 4- Done: tentar corrigir o facto de sempre q se quer fazer um move, o user tem de contar o número de linhas e colunas
 5- Done: Menu para escolha de modos de jogo
 6- Done: melhorar gameover screen
-7- verificar se jogada é válida e pedir input de novo. Atualmente, o jogo crasha se a jogada n for valida
+7- Done: verificar se jogada é válida e pedir input de novo. Atualmente, o jogo crasha se a jogada n for valida
