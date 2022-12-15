@@ -25,7 +25,7 @@ test_board([[block, block, block, player2_1, empty, player2_2, block, block, blo
 player(player1).
 player(player2).
 
-gamemode(1, hVh).
+gamemode(1, hVh):- write('MATCH').
 gamemode(2, hVc).
 gamemode(3, cvc).
 size(9).
@@ -92,16 +92,23 @@ check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),
                                      check_all_moves(Board, Tail).
 
 game_over(Board, Player):- marbles(Player, MarblesNames),
+                           write('over1'),
                            get_all_positions(Board, MarblesNames, Positions),
-                           \+check_all_moves(Board, Positions).
+                           write('over2'),
+                           \+check_all_moves(Board, Positions),
+                           write('over3').
 
 play_game:- start_board(Board),
             player(Player),
             print_board(Board),
             start_menu(GameMode),
+            write('pg1\n'),
+            nl, write(GameMode), nl,!,
             game_cycle(GameMode, Board-Player).
 
-game_cycle(_, Board-Player):- game_over(Board, Player), !,
+game_cycle(_, Board-Player):- write('gc_before_gameover\n'),
+                           game_over(Board, Player), !,
+                           write('gc_after_gameover\n'),
                            next_player(Player, NextPlayer),
                            congratulate(NextPlayer).
 
@@ -113,7 +120,7 @@ make_move(Player, Board, NewBoard):- repeat,
                                      write(PlayerString),nl,
                                      atom_string_number(Marble, MarbleString),
                                      write(MarbleString),nl,
-                                     get_marble_position(PlayerString, MarbleString, Board, L-C),
+                                     get_marble_position(PlayerString, MarbleString, Board, L-C),!,
                                      write(L-C), nl,
                                      valid_move(Board, L-C, LineDest-ColumnDest),
                                      write('OLA5\n'),
@@ -121,10 +128,17 @@ make_move(Player, Board, NewBoard):- repeat,
                                      write('OLA6\n'),
                                      move_marble(Res, Board, L-C, LineDest-ColumnDest, NewBoard).
 
-game_cycle(hVh, Board-Player):- make_move(Player, Board, NewBoard),
+game_cycle(hVh, Board-Player):- write('cycle1\n'),
+                           make_move(Player, Board, NewBoard),
+                           write('cycle2\n'),
                            next_player(Player, NextPlayer),
                            print_board(NewBoard),
                            game_cycle(hVh, NewBoard-NextPlayer).
 
-game_cycle(hVc, Board-Player):- write('Not implemented yet!'), nl.
-game_cycle(cVc, Board-Player):- write('Not implemented yet!'), nl.
+game_cycle(hVc, Board-Player):- write('Not implemented yet!1'), nl.
+game_cycle(cVc, Board-Player):- write('Not implemented yet!2'), nl.
+
+
+
+teste([], -1000000).
+teste(List, 5000).
