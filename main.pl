@@ -191,6 +191,7 @@ sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-    depthMin
                                                                         sublistDepthMinimaxCalls(Rest, Player, Depth, 1, MLCs2, Scores2),
                                                                         append([S1], Scores2, Scores),
                                                                         append([MLC1], MLCs2, MLCs).
+
 sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 0, MLCs1, Scores1),
                                                                         min_list(Scores1, S1, I1),
                                                                         nth0(I1, MLCs1, MLC1),
@@ -221,8 +222,7 @@ minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      write('l
                                                                         write('loop28'), nth0(I, MarblesOpponentPlayer, Marble),
                                                                         write('loop29'), nth0(I, Is, TmpI),
                                                                         write('loop20'), nth0(I, MovesOpponentPlayer, TmpMoves),
-                                                                        write('loop2a'), nth0(TmpI, TmpMoves, LineMove-ColumnMove). 
-
+                                                                        write('loop2a'), nth0(TmpI, TmpMoves, LineMove-ColumnMove), write('loop2b'). 
 
 minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  write('loop3'), write(' '), write(Depth), write('\n'), marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
