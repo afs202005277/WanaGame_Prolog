@@ -67,16 +67,32 @@ next_player(player1, player2).
 next_player(player2, player1).
 
 
+get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
+                                                              NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
+
+get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
+                                                              NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
+
+get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex-1) mod 9.
+
+get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
+                                                              NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
+
+get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
+                                                              NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
+get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex+1) mod 9.
+                                                              
+
 valid_move_left(_, X-Y, X-Y).
 valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
-                                                        nth0(Cidx_f, Line, empty),
-                                                        NewY is (Cidx_f-1) mod 9,
-                                                        valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
+                                                       nth0(Cidx_f, Line, empty),
+                                                       get_new_value_left(Lidx_i, Cidx_f, NewY),
+                                                       valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
 valid_move_right(_, X-Y, X-Y).
 valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
                                                   nth0(Cidx_f, Line, empty),
-                                                  NewY is (Cidx_f+1) mod 9,
+                                                  get_new_value_right(Lidx_i, Cidx_f, NewY),
                                                   valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
 valid_move_up(_, X-Y, X-Y).
@@ -175,8 +191,6 @@ game_over(Board, Player):- marbles(Player, MarblesNames),
                            \+check_all_moves(Board, Positions).
 
 game_cycle(_, Board-Player):-game_over(Board, Player), !,
-                            nl,nl,nl, write(Player),
-                            print_board(Board),
                            next_player(Player, NextPlayer),
                            congratulate(NextPlayer),
                            retractall(bot_difficulty(_, _)).
@@ -202,12 +216,11 @@ game_cycle(cVh, Board-player1):- bot_difficulty(player1, Level),
                                  make_move_ai(Level, player1, Board, NewBoard),
                                  next_player(player1, NextPlayer),
                                  print_board(NewBoard),
-                                 game_cycle(hVc, NewBoard-NextPlayer).
+                                 game_cycle(cVh, NewBoard-NextPlayer).
 
 game_cycle(cVh, Board-player2):- repeat,
                                  make_move(player2, Board, NewBoard),
                                  next_player(player2, NextPlayer),
-                                 print_board(NewBoard),
                                  game_cycle(cVh, NewBoard-NextPlayer).
 
 game_cycle(cVc, Board-Player):- write('Not implemented yet!2'), nl.
