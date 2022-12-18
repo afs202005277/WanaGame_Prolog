@@ -54,7 +54,7 @@ player(player2).
 gamemode(1, hVh).
 gamemode(2, hVc).
 gamemode(3, cVh).
-gamemode(4, cvc).
+gamemode(4, cVc).
 
 ai_level(1, easy).
 ai_level(2, hard).
@@ -223,7 +223,12 @@ game_cycle(cVh, Board-player2):- repeat,
                                  next_player(player2, NextPlayer),
                                  game_cycle(cVh, NewBoard-NextPlayer).
 
-game_cycle(cVc, Board-Player):- write('Not implemented yet!2'), nl.
+game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
+                                make_move_ai(Level, Player, Board, NewBoard),
+                                next_player(Player, NextPlayer),
+                                write(Player), write(' played!\n\n'),
+                                print_board(NewBoard),
+                                game_cycle(cVc, NewBoard-NextPlayer).
 
 
 % reconsult('main.pl'), start_board(Board), best_move_ai(1, Board, player1, M, L-C).
