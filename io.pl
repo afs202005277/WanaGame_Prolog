@@ -54,19 +54,33 @@ retrieve_command(Player, Marble, Line-Column):- write(Player), write(' it is you
                          get_code(10).
 
 check_option(Option, GameMode):- gamemode(Option, GameMode).
-check_option(_, _):-  write('Invalid Option! Your choice must be one of 1, 2 or 3: '), fail.
+check_option(_, _):-  write('Invalid Option! Your choice must be one of 1, 2, 3 or 4: '), fail.
+
+check_option_ai_level(Option, Level):- ai_level(Option, Level).
+check_option_ai_level(_, _):- write('Invalid Option! Your choice must be one of 1 or 2: '), fail.
 
 start_menu(GameMode):- write('Greetings! This is our implementation of the Wana game.\n'),
                          write('We offer you different game modes, namely:\n'),
                          write('1- Multiplayer mode (human vs human)\n'),
                          write('2- Human vs Computer\n'),
-                         write('3- Computer vs Computer\n\n'),
+                         write('3- Computer vs Human\n'),
+                         write('4- Computer vs Computer\n\n'),
                          write('Please choose a game mode: '),
                          repeat,
                          read_number(Option),
                          get_code(10),
-                         write(Option),
                          check_option(Option, GameMode).
+
+set_ai_level(Level):- write('In our game you can choose one of 2 levels:\n'),
+                 write('1- Easy\n'),
+                 write('2- Hard\n'),
+                 write('Pease select one of the levels: '),
+                 repeat,
+                 read_number(Option),
+                 get_code(10),
+                 check_option_ai_level(Option, Level).
+
+
 
 % https://textkool.com/en/ascii-art-generator?hl=default&vl=default&font=Big&text=Player%201%20Won%20%20%20!!
 congratulate(player1):- write('  _____  _                         __  __          __             _ _ '),nl,

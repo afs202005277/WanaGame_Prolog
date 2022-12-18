@@ -1,7 +1,8 @@
 :-use_module(library(lists)), use_module(library(random)).
 :-use_module(library(between)).
+:- dynamic bot_difficulty/2.
 
-:- ['io.pl', 'utils.pl'].
+:- ['io.pl', 'utils.pl', 'ai.pl'].
 start_board([
         [block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
@@ -14,6 +15,18 @@ start_board([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
+test3_board([
+        [block, block, block, player2_1, empty, player2_2, block, block, block],
+        [block, block, block, player2_3, empty, player2_4, block, block, block],
+        [block, block, block, player2_5, player2_6, empty, block, block, block],
+        [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
+        [empty, empty, empty, empty, empty, empty, empty, empty, empty],
+        [empty, empty, empty, empty, empty, player1_8, empty, empty, empty],
+        [block, block, block, player1_5, empty, player1_6, block, block, block],
+        [block, block, block, player1_3, empty, player1_4, block, block, block],
+        [block, block, block, player1_1, player1_7, player1_2, block, block, block]
+        ]).
+
 test_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
         [block, block, block, player2_5, empty, player2_6, block, block, block],
@@ -24,15 +37,28 @@ test_board([[block, block, block, player2_1, empty, player2_2, block, block, blo
         [block, block, block, player1_3, empty, player1_4, block, block, block],
         [block, block, block, empty, player1_1, player1_2, block, block, block]]).
 
-test_board_board([[[[block,block,block,player2_1,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,player2_1,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,player2_1,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,player2_1,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,player2_1,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,player2_1,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,player2_1,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,empty,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,player2_1,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]]],[[[block,block,block,player2_3,player2_1,player2_2,block,block,block],[block,block,block,empty,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,empty,player2_3,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,empty,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,player2_3,player1_1,player1_2,block,block,block]]],[[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,player2_4,empty,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]]],[[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,empty,player2_5,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]]],[[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,player2_6,empty,block,block,block],[empty,empty,empty,player2_7,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]]],[[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[player2_7,empty,empty,empty,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,player2_7,empty,empty,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,player2_7,empty,empty,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,empty,player2_7,player2_8,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,empty,empty,player2_8,player2_7,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,empty,empty,player2_8,empty,player2_7,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,empty,empty,player2_8,empty,empty,player2_7],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,empty,empty,player2_8,empty,empty,empty],[empty,empty,empty,player2_7,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]]],[[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[player2_8,empty,empty,player2_7,empty,empty,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,player2_8,empty,player2_7,empty,empty,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,player2_8,player2_7,empty,empty,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,player2_8,empty,empty,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,empty,player2_8,empty,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,empty,empty,player2_8,empty],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,empty,empty,empty,player2_8],[empty,empty,empty,empty,empty,empty,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]],[[block,block,block,empty,player2_1,player2_2,block,block,block],[block,block,block,player2_3,empty,player2_4,block,block,block],[block,block,block,player2_5,empty,player2_6,block,block,block],[empty,empty,empty,player2_7,empty,empty,empty,empty,empty],[empty,empty,empty,empty,empty,player2_8,empty,empty,empty],[empty,empty,empty,player1_7,empty,player1_8,empty,empty,empty],[block,block,block,player1_5,empty,player1_6,block,block,block],[block,block,block,player1_3,empty,player1_4,block,block,block],[block,block,block,empty,player1_1,player1_2,block,block,block]]]]).
+test2_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
+        [block, block, block, player2_3, empty, player2_4, block, block, block],
+        [block, block, block, player2_5, empty, player2_6, block, block, block],
+        [empty, empty, empty, empty, player2_7, player2_8, empty, empty, empty],
+        [empty, empty, empty, empty, empty, empty, empty, empty, empty],
+        [empty, empty, empty, player1_7, empty, player1_8, empty, empty, empty],
+        [block, block, block, empty, player1_5, player1_6, block, block, block],
+        [block, block, block, player1_3, empty, player1_4, block, block, block],
+        [block, block, block, player1_1, empty, player1_2, block, block, block]]).
+size(9).
 
 player(player1).
 player(player2).
 
 gamemode(1, hVh).
 gamemode(2, hVc).
-gamemode(3, cvc).
-size(9).
+gamemode(3, cVh).
+gamemode(4, cvc).
+
+ai_level(1, easy).
+ai_level(2, hard).
+
 
 marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).
 marbles(player2, [player2_1, player2_2, player2_3, player2_4, player2_5, player2_6, player2_7, player2_8]).
@@ -102,7 +128,7 @@ check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),
 
 
 check_valid_move(Board, L-C, LineDest-ColumnDest):- valid_move(Board, L-C, LineDest-ColumnDest).
-check_valid_move(Board, L-C, LineDest-ColumnDest):- write('You are not allowed to make that move!\n'),
+check_valid_move(_, _-_, _-_):- write('You are not allowed to make that move!\n'),
                                                      fail.
 
 make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-ColumnDest),
@@ -112,166 +138,48 @@ make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-C
                                      check_valid_move(Board, L-C, LineDest-ColumnDest),
                                      move_marble(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
 
+make_move_ai(easy, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove),
+                                              findIndexesBoard(Board, Marble, Line-Column),
+                                              insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
+                                              insert_in_board(NB1, empty, Line, Column, NewBoard).
 
-
-get_all_moves_from_all_pos(Board, [], []).
-get_all_moves_from_all_pos(Board, [L-C|Rest], Moves):-  get_all_moves_from_pos(Board, L-C, M1), 
-                                                        get_all_moves_from_all_pos(Board, Rest, M2), 
-                                                        append([M1], M2, Moves).
-
-choose_from_list([], _, []).
-choose_from_list([A|Rest], 0, A).
-choose_from_list([A|Rest], X, RetList):- length(Rest, S), Size is S+1, X<Size, X>0, X1 is X-1, choose_from_list(Rest, X1, RetList).
-
-best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
-                                                                get_all_positions(Board, MarblesNames, Positions),
-                                                                get_all_moves_from_all_pos(Board, Positions, Moves),
-                                                                length(Moves, LP1),
-                                                                LenPos is LP1-1,
-                                                                random(0, LenPos, N1),
-                                                                choose_from_list(Moves, N1, Ins),
-                                                                length(Ins, LP2),
-                                                                LenIns is LP2-1,
-                                                                (       LenIns =:= 0 ->
-                                                                                N2 = 0
-                                                                ;       otherwise ->
-                                                                                random(0, LenIns, N2)
-                                                                ),
-                                                                choose_from_list(Ins, N2, LineMove-ColumnMove),
-                                                                choose_from_list(MarblesNames, N1, Marble).
-
-
-movesSum([], 0).
-movesSum([A|Rest], Score) :- movesSum(Rest, S1), length(A, M), Score is S1+M.
-
-evaluationScore(Board, Player, Score):- marbles(Player, MarblesPlayer),
-                                        get_all_positions(Board, MarblesPlayer, PositionsPlayer),
-                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
-                                        movesSum(MovesPlayer, S1),
-                                        next_player(Player, Opponent),
-                                        marbles(Opponent, MarblesOpponent),
-                                        get_all_positions(Board, MarblesOpponent, PositionsOpponent),
-                                        get_all_moves_from_all_pos(Board, PositionsOpponent, MovesOpponent),
-                                        movesSum(MovesOpponent, S2),
-                                        Score is S1-S2.
-
-all_boards_aux(_, _, _, [], []).
-all_boards_aux(Board, Player, Marble, [L-C|RestListOfMoves], NewBoards):- findIndexesBoard(Board, Marble, L_ini-C_ini), 
-                                                                          insert_in_board(Board, Marble, L, C, NB1), 
-                                                                          insert_in_board(NB1, empty, L_ini, C_ini, NewBoard),
-                                                                          all_boards_aux(Board, Player, Marble, RestListOfMoves, Res),
-                                                                          append([NewBoard], Res, NewBoards).
-
-all_boards(_, _, _, [], []).
-all_boards(Board, Player, [FirstMarble|RestMarbles], [First|RestMoves], NewBoards):- all_boards_aux(Board, Player, FirstMarble, First, Res), 
-                                                                                     all_boards(Board, Player, RestMarbles, RestMoves, Res2),
-                                                                                     append([Res], Res2, NewBoards).
-
-allEvaluationScore([], Player, []).
-allEvaluationScore([A|Rest], Player, Scores):- evaluationScore(A, Player, S1), allEvaluationScore(Rest, Player, S2), append([S1], S2, Scores).
-
-sublistBestEvaluationScore([], Player, [], []).
-sublistBestEvaluationScore([[]|Rest], Player, Scores, Is):- sublistBestEvaluationScore(Rest, Player, Scores, Is).
-sublistBestEvaluationScore([A|Rest], Player, Scores, Is):- allEvaluationScore(A, Player, S1), max_list(S1, M, I), sublistBestEvaluationScore(Rest, Player, S2, Is1), append([M], S2, Scores), append([I], Is1, Is).
-
-depthMinimaxCalls([], _, _, _, [], []).
-
-depthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-   minimax(A, Player, Depth, 1, M, LM-CM, S1),
-                                                                depthMinimaxCalls(Rest, Player, Depth, 1, TmpMLCs, TmpScores),
-                                                                append([M-LM-CM], TmpMLCs, MLCs),
-                                                                append([S1], TmpScores, Scores).
-
-depthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-   minimax(A, Player, Depth, 0, M, LM-CM, S1),
-                                                                depthMinimaxCalls(Rest, Player, Depth, 0, TmpMLCs, TmpScores),
-                                                                append([M-LM-CM], TmpMLCs, MLCs),
-                                                                append([S1], TmpScores, Scores).
-
-andreSousa([], [], -100000000, player1_1-2-2).
-andreSousa(Scores1, MLCs1, S1, MLC1):- max_list(Scores1, S1, I1), nth0(I1, MLCs1, MLC1).
-
-sousaAndre([], [], 100000000, player2_1-2-2).
-sousaAndre(Scores1, MLCs1, S1, MLC1):- min_list(Scores1, S1, I1), nth0(I1, MLCs1, MLC1).
-
-sublistDepthMinimaxCalls([], _, _, _, [], []).
-sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 1, MLCs1, Scores1),
-                                                                        andreSousa(Scores1, MLCs1, S1, MLC1),
-                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 1, MLCs2, Scores2),
-                                                                        append([S1], Scores2, Scores),
-                                                                        append([MLC1], MLCs2, MLCs).
-
-sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 0, MLCs1, Scores1),
-                                                                        sousaAndre(Scores1, MLCs1, S1, MLC1),
-                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 0, MLCs2, Scores2),
-                                                                        append([S1], Scores2, Scores),
-                                                                        append([MLC1], MLCs2, MLCs).
-
-minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
-                                                                        get_all_positions(Board, MarblesPlayer, PositionsPlayer),
-                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
-                                                                        all_boards(Board, Player, MarblesPlayer, MP, NewBoards),
-                                                                        del_all([], MP, MovesPlayer),
-                                                                        sublistBestEvaluationScore(NewBoards, Player, TmpScores, Is),
-                                                                        max_list(TmpScores, Score, I),
-                                                                        nth0(I, MarblesPlayer, Marble),
-                                                                        nth0(I, Is, TmpI),
-                                                                        nth0(I, MovesPlayer, TmpMoves),
-                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove).
-
-
-minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      next_player(Player, OpponentPlayer),
-                                                                        marbles(OpponentPlayer, MarblesOpponentPlayer),
-                                                                        get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
-                                                                        get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MOP),
-                                                                        all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MOP, NewBoards),
-                                                                        del_all([], MOP, MovesOpponentPlayer),
-                                                                        sublistBestEvaluationScore(NewBoards, Player, TmpScores, Is),
-                                                                        min_list(TmpScores, Score, I),
-                                                                        nth0(I, MarblesOpponentPlayer, Marble),
-                                                                        nth0(I, Is, TmpI),
-                                                                        nth0(I, MovesOpponentPlayer, TmpMoves),
-                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove).
-
-minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
-                                                                        get_all_positions(Board, MarblesPlayer, PositionsPlayer),
-                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
-                                                                        all_boards(Board, Player, MarblesPlayer, MovesPlayer, NewBoards),
-                                                                        D1 is Depth-1,
-                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 1, MLCs, Scores),
-                                                                        max_list(Scores, Score, I),
-                                                                        nth0(I, MLCs, Marble-LineMove-ColumnMove).
-
-
-minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_player(Player, OpponentPlayer),
-                                                                        marbles(OpponentPlayer, MarblesOpponentPlayer),
-                                                                        get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
-                                                                        get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MovesOpponentPlayer),
-                                                                        all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MovesOpponentPlayer, NewBoards),
-                                                                        D1 is Depth-1,
-                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 0, MLCs, Scores),
-                                                                        %write(MLCs), nl, write(Scores),nl,
-                                                                        min_list(Scores, Score, I),
-                                                                        nth0(I, MLCs, Marble-LineMove-ColumnMove).
-
-
-best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 3, 0, Marble, LineMove-ColumnMove, _).
-
-% reconsult('main.pl'), start_board(Board), best_move_ai(1, Board, player1, M, L-C).
-% write('\33\[2J').
+make_move_ai(hard, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove),
+                                              findIndexesBoard(Board, Marble, Line-Column),
+                                              insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
+                                              insert_in_board(NB1, empty, Line, Column, NewBoard).
 
 play_game:- start_board(Board),
             player(Player),
             print_board(Board),
             start_menu(GameMode),
             !,
-            game_cycle(GameMode, Board-Player).
+            game_cycle_wrapper(GameMode, Board-Player).
+
+game_cycle_wrapper(hVh, Board-Player):- game_cycle(hVh, Board-Player).
+game_cycle_wrapper(cVh, Board-Player):- set_ai_level(Level),
+                                        assert(bot_difficulty(player1, Level)),
+                                        game_cycle(cVh, Board-Player).
+
+game_cycle_wrapper(hVc, Board-Player):- set_ai_level(Level),
+                                        assert(bot_difficulty(player2, Level)),
+                                        game_cycle(hVc, Board-Player).
+
+game_cycle_wrapper(cVc, Board-Player):- set_ai_level(Level1),
+                                        assert(bot_difficulty(player1, Level1)),
+                                        set_ai_level(Level2),
+                                        assert(bot_difficulty(player2, Level2)),
+                                        game_cycle(cVc, Board-Player).
 
 game_over(Board, Player):- marbles(Player, MarblesNames),
                            get_all_positions(Board, MarblesNames, Positions),
                            \+check_all_moves(Board, Positions).
 
 game_cycle(_, Board-Player):-game_over(Board, Player), !,
+                            nl,nl,nl, write(Player),
+                            print_board(Board),
                            next_player(Player, NextPlayer),
-                           congratulate(NextPlayer).
+                           congratulate(NextPlayer),
+                           retractall(bot_difficulty(_, _)).
 
 game_cycle(hVh, Board-Player):- repeat,
                            make_move(Player, Board, NewBoard),
@@ -279,6 +187,30 @@ game_cycle(hVh, Board-Player):- repeat,
                            print_board(NewBoard),
                            game_cycle(hVh, NewBoard-NextPlayer).
 
+game_cycle(hVc, Board-player1):- repeat,
+                                 make_move(player1, Board, NewBoard),
+                                 next_player(player1, NextPlayer),
+                                 game_cycle(hVc, NewBoard-NextPlayer).
 
-game_cycle(hVc, Board-Player):- write('Not implemented yet!1'), nl.
+game_cycle(hVc, Board-player2):- bot_difficulty(player2, Level),
+                                 make_move_ai(Level, player2, Board, NewBoard),
+                                 next_player(player2, NextPlayer),
+                                 print_board(NewBoard),
+                                 game_cycle(hVc, NewBoard-NextPlayer).
+
+game_cycle(cVh, Board-player1):- bot_difficulty(player1, Level),
+                                 make_move_ai(Level, player1, Board, NewBoard),
+                                 next_player(player1, NextPlayer),
+                                 print_board(NewBoard),
+                                 game_cycle(hVc, NewBoard-NextPlayer).
+
+game_cycle(cVh, Board-player2):- repeat,
+                                 make_move(player2, Board, NewBoard),
+                                 next_player(player2, NextPlayer),
+                                 print_board(NewBoard),
+                                 game_cycle(cVh, NewBoard-NextPlayer).
+
 game_cycle(cVc, Board-Player):- write('Not implemented yet!2'), nl.
+
+
+% reconsult('main.pl'), start_board(Board), best_move_ai(1, Board, player1, M, L-C).
