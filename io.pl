@@ -5,20 +5,20 @@ print_line([block|Rest]):- print_formatted('     ', 11),
 print_line([First|Rest]):- print_formatted(First, 11),
                            print_line(Rest).
 
-print_board([], _):-nl.
-print_board([FirstLine|Rest], LineIndex):- append([LineIndex], FirstLine, Tmp),
+display_game([], _):-nl.
+display_game([FirstLine|Rest], LineIndex):- append([LineIndex], FirstLine, Tmp),
                                            append(Tmp, [LineIndex], Res),
                                            print_line(Res),
                                            nl,
                                            NewIdx is LineIndex+1,
-                                           print_board(Rest, NewIdx).
+                                           display_game(Rest, NewIdx).
 
-print_board(Board):- size(Size),
+display_game(Board):- size(Size),
                      Max is Size-1,
                      numlist(0, Max, L),
                      append([' '], L, Indexes),
                      print_line(Indexes),
-                     print_board(Board, 0),
+                     display_game(Board, 0),
                      print_line(Indexes).
 
 print_n(_, 0).

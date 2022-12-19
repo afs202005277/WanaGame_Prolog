@@ -97,7 +97,7 @@ game_over(Board, Player):- marbles(Player, MarblesNames),
 
 play_game:- start_board(Board),
             player(Player),
-            print_board(Board),
+            display_game(Board),
             game_cycle(Board-Player).
 
 game_cycle(Board-Player):- game_over(Board, Player), !,
@@ -107,7 +107,7 @@ game_cycle(Board-Player):- game_over(Board, Player), !,
 game_cycle(Board-Player):- retrieve_command(Player, Marble, Line-Column),
                            move_marble(Player, Marble, Board, Line-Column, NewBoard),
                            next_player(Player, NextPlayer),
-                           print_board(NewBoard),
+                           display_game(NewBoard),
                            game_cycle(NewBoard-NextPlayer).
 
 

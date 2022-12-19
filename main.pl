@@ -124,7 +124,7 @@ get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, valid_move(Bo
 get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, Marble, Res),
                                                           findIndexesBoard(Board, Res, Line-Column).
 
-move_marble(Player, Marble, Board, Line-Column, NewBoard):-     atom_string(Player, PlayerString),
+move(Player, Marble, Board, Line-Column, NewBoard):-     atom_string(Player, PlayerString),
                                                                 atom_string_number(Marble, MarbleString),
                                                                 get_marble_position(PlayerString, MarbleString, Board, L-C),
                                                                 valid_move(Board, L-C, Line-Column),
@@ -152,7 +152,7 @@ make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-C
                                      atom_string_number(Marble, MarbleString),
                                      get_marble_position(PlayerString, MarbleString, Board, L-C),!,
                                      check_valid_move(Board, L-C, LineDest-ColumnDest),
-                                     move_marble(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
+                                     move(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
 
 make_move_ai(easy, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove),
                                               findIndexesBoard(Board, Marble, Line-Column),
@@ -164,9 +164,9 @@ make_move_ai(hard, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Mar
                                               insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
                                               insert_in_board(NB1, empty, Line, Column, NewBoard).
 
-play_game:- start_board(Board),
+play:- start_board(Board),
             player(Player),
-            print_board(Board),
+            display_game(Board),
             start_menu(GameMode),
             !,
             game_cycle_wrapper(GameMode, Board-Player).
@@ -198,7 +198,7 @@ game_cycle(_, Board-Player):-game_over(Board, Player), !,
 game_cycle(hVh, Board-Player):- repeat,
                            make_move(Player, Board, NewBoard),
                            next_player(Player, NextPlayer),
-                           print_board(NewBoard),
+                           display_game(NewBoard),
                            game_cycle(hVh, NewBoard-NextPlayer).
 
 game_cycle(hVc, Board-player1):- repeat,
@@ -209,13 +209,13 @@ game_cycle(hVc, Board-player1):- repeat,
 game_cycle(hVc, Board-player2):- bot_difficulty(player2, Level),
                                  make_move_ai(Level, player2, Board, NewBoard),
                                  next_player(player2, NextPlayer),
-                                 print_board(NewBoard),
+                                 display_game(NewBoard),
                                  game_cycle(hVc, NewBoard-NextPlayer).
 
 game_cycle(cVh, Board-player1):- bot_difficulty(player1, Level),
                                  make_move_ai(Level, player1, Board, NewBoard),
                                  next_player(player1, NextPlayer),
-                                 print_board(NewBoard),
+                                 display_game(NewBoard),
                                  game_cycle(cVh, NewBoard-NextPlayer).
 
 game_cycle(cVh, Board-player2):- repeat,
@@ -227,7 +227,7 @@ game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
                                 make_move_ai(Level, Player, Board, NewBoard),
                                 next_player(Player, NextPlayer),
                                 write(Player), write(' played!\n\n'),
-                                print_board(NewBoard),
+                                display_game(NewBoard),
                                 game_cycle(cVc, NewBoard-NextPlayer).
 
 
