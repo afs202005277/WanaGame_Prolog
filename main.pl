@@ -18,21 +18,21 @@ start_board([
 test3_board([
         [block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
-        [block, block, block, player2_5, player2_6, empty, block, block, block],
+        [block, block, block, player2_5, empty, player2_6, block, block, block],
         [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
-        [empty, empty, empty, empty, empty, empty, empty, empty, empty],
+        [empty, empty, empty, player1_7, empty, empty, empty, empty, empty],
         [empty, empty, empty, empty, empty, player1_8, empty, empty, empty],
         [block, block, block, player1_5, empty, player1_6, block, block, block],
         [block, block, block, player1_3, empty, player1_4, block, block, block],
-        [block, block, block, player1_1, player1_7, player1_2, block, block, block]
+        [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
 test_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
         [block, block, block, player2_5, empty, player2_6, block, block, block],
-        [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
-        [empty, empty, empty, empty, empty, empty, empty, empty, empty],
-        [empty, empty, empty, player1_7, empty, player1_8, empty, empty, empty],
+        [player1_7, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
+        [block, empty, empty, empty, empty, empty, empty, empty, empty],
+        [empty, empty, empty, empty, empty, player1_8, empty, empty, empty],
         [block, block, block, player1_5, empty, player1_6, block, block, block],
         [block, block, block, player1_3, empty, player1_4, block, block, block],
         [block, block, block, empty, player1_1, player1_2, block, block, block]]).
@@ -81,6 +81,22 @@ get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
 get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
                                                               NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
 get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex+1) mod 9.
+
+get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex < 3,
+                                                              NewLineIndex is 3 + ((LineIndex+1) mod 3).
+
+get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex > 5,
+                                                              NewLineIndex is 3 + ((LineIndex+1) mod 3).
+
+get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 3, CurrentColIndex =< 5, NewLineIndex is (LineIndex+1) mod 9.
+
+get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex < 3,
+                                                              NewLineIndex is 3 + ((LineIndex-1) mod 3).
+
+get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex > 5,
+                                                              NewLineIndex is 3 + ((LineIndex-1) mod 3).
+
+get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 3, CurrentColIndex =< 5, NewLineIndex is (LineIndex-1) mod 9.
                                                               
 
 valid_move_left(_, X-Y, X-Y).
@@ -98,13 +114,13 @@ valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line
 valid_move_up(_, X-Y, X-Y).
 valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line),
                                                   nth0(Cidx_i, Line, empty),
-                                                  NewX is (Lidx_f+1) mod 9,
+                                                  get_new_value_up(Lidx_f, Cidx_i, NewX),
                                                   valid_move_up(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
 
 valid_move_down(_, X-Y, X-Y).
 valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line),
                                                   nth0(Cidx_i, Line, empty),
-                                                  NewX is (Lidx_f-1) mod 9,
+                                                  get_new_value_down(Lidx_f, Cidx_i, NewX),
                                                   valid_move_down(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
 
 valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
