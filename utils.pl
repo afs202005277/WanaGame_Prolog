@@ -69,3 +69,7 @@ del_all(Elem, [Elem|T1], List2):-del_all(Elem, T1, List2).
 del_all(Elem, [H1|T1], List2):-Elem\==H1,
                                del_all(Elem, T1, Res),
                                append([H1], Res, List2).
+
+marble_naming(Player, Marble, Res) :- append("_", Marble, Suffix),
+                                      append(Player, Suffix, Target),
+                                      atom_string(Res, Target).

@@ -2,7 +2,7 @@
 :-use_module(library(between)).
 :- dynamic bot_difficulty/2.
 
-:- ['io.pl', 'utils.pl', 'ai.pl'].
+:- ['io.pl', 'utils.pl', 'ai.pl', 'valid_moves.pl'].
 start_board([
         [block, block, block, player2_1, empty, player2_2, block, block, block],
         [block, block, block, player2_3, empty, player2_4, block, block, block],
@@ -51,6 +51,9 @@ size(9).
 player(player1).
 player(player2).
 
+marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).
+marbles(player2, [player2_1, player2_2, player2_3, player2_4, player2_5, player2_6, player2_7, player2_8]).
+
 gamemode(1, hVh).
 gamemode(2, hVc).
 gamemode(3, cVh).
@@ -59,79 +62,8 @@ gamemode(4, cVc).
 ai_level(1, easy).
 ai_level(2, hard).
 
-
-marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).
-marbles(player2, [player2_1, player2_2, player2_3, player2_4, player2_5, player2_6, player2_7, player2_8]).
-
 next_player(player1, player2).
 next_player(player2, player1).
-
-
-get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
-                                                              NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
-
-get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
-                                                              NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
-
-get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex-1) mod 9.
-
-get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
-                                                              NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
-
-get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
-                                                              NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
-get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex+1) mod 9.
-
-get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex < 3,
-                                                              NewLineIndex is 3 + ((LineIndex+1) mod 3).
-
-get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex > 5,
-                                                              NewLineIndex is 3 + ((LineIndex+1) mod 3).
-
-get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 3, CurrentColIndex =< 5, NewLineIndex is (LineIndex+1) mod 9.
-
-get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex < 3,
-                                                              NewLineIndex is 3 + ((LineIndex-1) mod 3).
-
-get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex > 5,
-                                                              NewLineIndex is 3 + ((LineIndex-1) mod 3).
-
-get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 3, CurrentColIndex =< 5, NewLineIndex is (LineIndex-1) mod 9.
-                                                              
-
-valid_move_left(_, X-Y, X-Y).
-valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
-                                                       nth0(Cidx_f, Line, empty),
-                                                       get_new_value_left(Lidx_i, Cidx_f, NewY),
-                                                       valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
-
-valid_move_right(_, X-Y, X-Y).
-valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
-                                                  nth0(Cidx_f, Line, empty),
-                                                  get_new_value_right(Lidx_i, Cidx_f, NewY),
-                                                  valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
-
-valid_move_up(_, X-Y, X-Y).
-valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line),
-                                                  nth0(Cidx_i, Line, empty),
-                                                  get_new_value_up(Lidx_f, Cidx_i, NewX),
-                                                  valid_move_up(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
-
-valid_move_down(_, X-Y, X-Y).
-valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line),
-                                                  nth0(Cidx_i, Line, empty),
-                                                  get_new_value_down(Lidx_f, Cidx_i, NewX),
-                                                  valid_move_down(Board, Lidx_i-Cidx_i, NewX-Cidx_i).
-
-valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
-                                                  valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i).
-
-valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
-                                                  valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f).
-
-marble_naming(Player, Marble, Res) :- append("_", Marble, Suffix),
-                                      append(Player, Suffix, Target),
-                                      atom_string(Res, Target).
 
 get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, valid_move(Board, Lidx_i-Cidx_i, L-C), Res), 
                                              remove_dups(Res, Deduplicated),
@@ -157,11 +89,6 @@ check_all_moves(_, []).
 check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),
                                      \+length(Res, 0),
                                      check_all_moves(Board, Tail).
-
-
-check_valid_move(Board, L-C, LineDest-ColumnDest):- valid_move(Board, L-C, LineDest-ColumnDest).
-check_valid_move(_, _-_, _-_):- write('You are not allowed to make that move!\n'),
-                                                     fail.
 
 make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-ColumnDest),
                                      atom_string(Player, PlayerString),
