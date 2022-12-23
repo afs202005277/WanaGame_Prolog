@@ -159,7 +159,7 @@ make_move_ai(easy, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Mar
                                               insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
                                               insert_in_board(NB1, empty, Line, Column, NewBoard).
 
-make_move_ai(hard, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove),
+make_move_ai(hard, Player, Board, NewBoard):- best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove),
                                               findIndexesBoard(Board, Marble, Line-Column),
                                               insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
                                               insert_in_board(NB1, empty, Line, Column, NewBoard).

@@ -42,34 +42,26 @@ sublistBestEvaluationScore([A|Rest], Player, Scores, Is):- allEvaluationScore(A,
 
 depthMinimaxCalls([], _, _, _, [], []).
 
-depthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-   minimax(A, Player, Depth, 1, M, LM-CM, S1),
-                                                                depthMinimaxCalls(Rest, Player, Depth, 1, TmpMLCs, TmpScores),
-                                                                append([M-LM-CM], TmpMLCs, MLCs),
+depthMinimaxCalls([A|Rest], Player, Depth, 1, LCs, Scores):-   minimax(A, Player, Depth, 1, M, LM-CM, S1),
+                                                                depthMinimaxCalls(Rest, Player, Depth, 1, TmpLCs, TmpScores),
+                                                                append([LM-CM], TmpLCs, LCs),
                                                                 append([S1], TmpScores, Scores).
 
-depthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-   minimax(A, Player, Depth, 0, M, LM-CM, S1),
-                                                                depthMinimaxCalls(Rest, Player, Depth, 0, TmpMLCs, TmpScores),
-                                                                append([M-LM-CM], TmpMLCs, MLCs),
+depthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-   minimax(A, Player, Depth, 0, M, LM-CM, S1),
+                                                                depthMinimaxCalls(Rest, Player, Depth, 0, TmpLCs, TmpScores),
+                                                                append([LM-CM], TmpLCs, LCs),
                                                                 append([S1], TmpScores, Scores).
-
-andreSousa([], [], -100000000, player1_1-2-2).
-andreSousa(Scores1, MLCs1, S1, MLC1):- max_list(Scores1, S1, I1), nth0(I1, MLCs1, MLC1).
-
-sousaAndre([], [], 100000000, player2_1-2-2).
-sousaAndre(Scores1, MLCs1, S1, MLC1):- min_list(Scores1, S1, I1), nth0(I1, MLCs1, MLC1).
 
 sublistDepthMinimaxCalls([], _, _, _, [], []).
-sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 1, MLCs1, Scores1),
-                                                                        andreSousa(Scores1, MLCs1, S1, MLC1),
-                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 1, MLCs2, Scores2),
-                                                                        append([S1], Scores2, Scores),
-                                                                        append([MLC1], MLCs2, MLCs).
+sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, LCs, Scores):-     depthMinimaxCalls(A, Player, Depth, 1, LCs1, Scores1),
+                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 1, LCs2, Scores2),
+                                                                        append([LCs1], LCs2, LCs),
+                                                                        append([Scores1], Scores2, Scores).
 
-sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, MLCs, Scores):-    depthMinimaxCalls(A, Player, Depth, 0, MLCs1, Scores1),
-                                                                        sousaAndre(Scores1, MLCs1, S1, MLC1),
-                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 0, MLCs2, Scores2),
-                                                                        append([S1], Scores2, Scores),
-                                                                        append([MLC1], MLCs2, MLCs).
+sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-     depthMinimaxCalls(A, Player, Depth, 0, LCs1, Scores1),
+                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 0, LCs2, Scores2),
+                                                                        append([Scores1], Scores2, Scores),
+                                                                        append([LCs1], LCs2, LCs).
 
 minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
@@ -97,15 +89,32 @@ minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      next_pla
                                                                         nth0(I, MovesOpponentPlayer, TmpMoves),
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
+maplist(_, [], []).
+maplist(Pred, [H|T], [M|Ms]) :-
+    call(Pred, H, M, _),
+    maplist(Pred, T, Ms).
+
+max_list_index(Lists, Index) :-
+    maplist(max_list, Lists, Maxes),
+    max_list(Maxes, Max, Index).
+
+min_list_index(Lists, Index) :-
+    maplist(min_list, Lists, Mins),
+    max_list(Mins, Min, Index).
+
+
 minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
                                                                         all_boards(Board, Player, MarblesPlayer, MovesPlayer, NewBoards),
                                                                         D1 is Depth-1,
-                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 1, MLCs, Scores),
-                                                                        max_list(Scores, Score, I),
-                                                                        nth0(I, MLCs, Marble-LineMove-ColumnMove).
-
+                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 1, LCs, Scores),
+                                                                        max_list_index(Scores, MarbleInd),
+                                                                        nth0(MarbleInd, Scores, MarbleScores),
+                                                                        nth0(MarbleInd, MovesPlayer, MarbleMoves),
+                                                                        max_list(MarbleScores, Score, I),
+                                                                        nth0(I, MarbleMoves, LineMove-ColumnMove),
+                                                                        nth0(MarbleInd, MarblesPlayer, Marble).
 
 minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_player(Player, OpponentPlayer),
                                                                         marbles(OpponentPlayer, MarblesOpponentPlayer),
@@ -113,10 +122,13 @@ minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_pla
                                                                         get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MovesOpponentPlayer),
                                                                         all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MovesOpponentPlayer, NewBoards),
                                                                         D1 is Depth-1,
-                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 0, MLCs, Scores),
-                                                                        %write(MLCs), nl, write(Scores),nl,
-                                                                        min_list(Scores, Score, I),
-                                                                        nth0(I, MLCs, Marble-LineMove-ColumnMove).
+                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 0, LCs, Scores),
+                                                                        min_list_index(Scores, MarbleInd),
+                                                                        nth0(MarbleInd, Scores, MarbleScores),
+                                                                        nth0(MarbleInd, MovesOpponentPlayer, MarbleMoves),
+                                                                        min_list(MarbleScores, Score, I),
+                                                                        nth0(I, MarbleMoves, LineMove-ColumnMove),
+                                                                        nth0(MarbleInd, MarblesOpponentPlayer, Marble).
 
 best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
                                                                 get_all_positions(Board, MarblesNames, Positions),
@@ -135,4 +147,4 @@ best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, 
                                                                 choose_from_list(Ins, N2, LineMove-ColumnMove),
                                                                 choose_from_list(MarblesNames, N1, Marble).
 
-best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 3, 0, Marble, LineMove-ColumnMove, _).
+best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 2, 0, Marble, LineMove-ColumnMove, _).
