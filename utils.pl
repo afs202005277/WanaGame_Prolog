@@ -73,3 +73,7 @@ del_all(Elem, [H1|T1], List2):-Elem\==H1,
 marble_naming(Player, Marble, Res) :- append("_", Marble, Suffix),
                                       append(Player, Suffix, Target),
                                       atom_string(Res, Target).
+
+clear_input:-peek_char('\n'), get_char(_), !.
+clear_input:- get_code(_),
+              clear_input.

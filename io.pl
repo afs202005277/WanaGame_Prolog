@@ -41,15 +41,20 @@ print_formatted(Content, TargetSize):- atom_length(Content, ContentLength),
                                          Remaining >= 0,
                                          print_text(Content, Remaining).
 
+check_marble_id(Marble):- Marble > 0, Marble < 9, peek_char('\n'), get_char('\n').
+check_marble_id(_):- write('Invalid marble! Your choice must be between 1 and 8, including.\n'), clear_input, fail.
+
+check_separator:- get_char('-').
+check_separator:- write('The coordinates input must be in the format "LineIndex-ColumnIndex".\nFurthermore, each coordinate must be between 0 and 8, including.\n'), !, clear_input, fail.
 
 retrieve_command(Player, Marble, Line-Column):- write(Player), write(' it is your turn!'),
                                                 nl,
                          write('Which marble you want to move? '),
                          read_number(Marble),
-                         get_code(10),
+                         check_marble_id(Marble),
                          write('Where do you want to move it? [Line-Column] '),
-                         read_number(Line),
-                         get_char('-'),
+                         read_number(Line),!,
+                         check_separator,
                          read_number(Column),
                          get_code(10).
 
