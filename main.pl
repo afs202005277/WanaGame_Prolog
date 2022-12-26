@@ -1,6 +1,5 @@
-:-use_module(library(lists)), use_module(library(random)).
-:-use_module(library(between)).
-:- dynamic bot_difficulty/2.
+:-use_module(library(lists)), use_module(library(random)), use_module(library(between)).
+:-dynamic bot_difficulty/2.
 
 :- ['io.pl', 'utils.pl', 'ai.pl', 'valid_moves.pl'].
 start_board([
@@ -15,37 +14,6 @@ start_board([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
-test3_board([
-        [block, block, block, player2_1, empty, player2_2, block, block, block],
-        [block, block, block, player2_3, empty, player2_4, block, block, block],
-        [block, block, block, player2_5, empty, player2_6, block, block, block],
-        [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
-        [empty, empty, empty, player1_7, empty, empty, empty, empty, empty],
-        [empty, empty, empty, empty, empty, player1_8, empty, empty, empty],
-        [block, block, block, player1_5, empty, player1_6, block, block, block],
-        [block, block, block, player1_3, empty, player1_4, block, block, block],
-        [block, block, block, player1_1, empty, player1_2, block, block, block]
-        ]).
-
-test_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
-        [block, block, block, player2_3, empty, player2_4, block, block, block],
-        [block, block, block, player2_5, empty, player2_6, block, block, block],
-        [player1_7, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
-        [block, empty, empty, empty, empty, empty, empty, empty, empty],
-        [empty, empty, empty, empty, empty, player1_8, empty, empty, empty],
-        [block, block, block, player1_5, empty, player1_6, block, block, block],
-        [block, block, block, player1_3, empty, player1_4, block, block, block],
-        [block, block, block, empty, player1_1, player1_2, block, block, block]]).
-
-test2_board([[block, block, block, player2_1, empty, player2_2, block, block, block],
-        [block, block, block, player2_3, empty, player2_4, block, block, block],
-        [block, block, block, player2_5, empty, player2_6, block, block, block],
-        [empty, empty, empty, empty, player2_7, player2_8, empty, empty, empty],
-        [empty, empty, empty, empty, empty, empty, empty, empty, empty],
-        [empty, empty, empty, player1_7, empty, player1_8, empty, empty, empty],
-        [block, block, block, empty, player1_5, player1_6, block, block, block],
-        [block, block, block, player1_3, empty, player1_4, block, block, block],
-        [block, block, block, player1_1, empty, player1_2, block, block, block]]).
 size(9).
 
 player(player1).
@@ -97,12 +65,7 @@ make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-C
                                      check_valid_move(Board, L-C, LineDest-ColumnDest),
                                      move(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
 
-make_move_ai(easy, Player, Board, NewBoard):- best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove),
-                                              findIndexesBoard(Board, Marble, Line-Column),
-                                              insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
-                                              insert_in_board(NB1, empty, Line, Column, NewBoard).
-
-make_move_ai(hard, Player, Board, NewBoard):- best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove),
+make_move_ai(Difficulty, Player, Board, NewBoard):- best_move_ai(Difficulty, Board, Player, Marble, LineMove-ColumnMove),
                                               findIndexesBoard(Board, Marble, Line-Column),
                                               insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
                                               insert_in_board(NB1, empty, Line, Column, NewBoard).
@@ -173,5 +136,3 @@ game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
                                 display_game(NewBoard),
                                 game_cycle(cVc, NewBoard-NextPlayer).
 
-
-% reconsult('main.pl'), start_board(Board), best_move_ai(1, Board, player1, M, L-C).

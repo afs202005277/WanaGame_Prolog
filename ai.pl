@@ -89,17 +89,17 @@ minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      next_pla
                                                                         nth0(I, MovesOpponentPlayer, TmpMoves),
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
-maplist(_, [], []).
-maplist(Pred, [H|T], [M|Ms]) :-
+mapDoubleList(_, [], []).
+mapDoubleList(Pred, [H|T], [M|Ms]) :-
     call(Pred, H, M, _),
-    maplist(Pred, T, Ms).
+    mapDoubleList(Pred, T, Ms).
 
 max_list_index(Lists, Index) :-
-    maplist(max_list, Lists, Maxes),
+    mapDoubleList(max_list, Lists, Maxes),
     max_list(Maxes, Max, Index).
 
 min_list_index(Lists, Index) :-
-    maplist(min_list, Lists, Mins),
+    mapDoubleList(min_list, Lists, Mins),
     max_list(Mins, Min, Index).
 
 
@@ -130,7 +130,7 @@ minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_pla
                                                                         nth0(I, MarbleMoves, LineMove-ColumnMove),
                                                                         nth0(MarbleInd, MarblesOpponentPlayer, Marble).
 
-best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
+best_move_ai(easy, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
                                                                 get_all_positions(Board, MarblesNames, Positions),
                                                                 get_all_moves_from_all_pos(Board, Positions, Moves),
                                                                 length(Moves, LP1),
@@ -147,4 +147,4 @@ best_move_ai(0, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, 
                                                                 choose_from_list(Ins, N2, LineMove-ColumnMove),
                                                                 choose_from_list(MarblesNames, N1, Marble).
 
-best_move_ai(1, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 2, 0, Marble, LineMove-ColumnMove, _).
+best_move_ai(hard, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 2, 0, Marble, LineMove-ColumnMove, _).
