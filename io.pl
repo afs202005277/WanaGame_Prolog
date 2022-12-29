@@ -92,7 +92,7 @@ check_option(_, _):-  write('Invalid Option! Your choice must be one of 1, 2, 3 
 % If the option is valid, binds the atom to the corresponding AI level.
 % If the option is invalid, prints an error message and fails.
 check_option_ai_level(Option, Level):- ai_level(Option, Level).
-check_option_ai_level(_, _):- write('Invalid Option! Your choice must be one of 1 or 2: '), fail.
+check_option_ai_level(_, _):- write('Invalid Option! Your choice must be one of 1, 2 or 3: '), fail.
 
 % start_menu(-GameMode:atom)
 % Prompts the user to select a game mode from a list of options.
@@ -117,13 +117,13 @@ start_menu(GameMode):- write('Greetings! This is our implementation of the Wana 
 % Validates the input and fails
 set_ai_level(Level):- write('In our game you can choose one of 2 levels:\n'),
                  write('1- Easy\n'),
-                 write('2- Hard\n'),
+                 write('2- Medium\n'),
+                 write('3- Hard\n'),
                  write('Pease select one of the levels: '),
                  repeat,
                  read_number(Option),
                  get_code(10),
                  check_option_ai_level(Option, Level).
-
 
 
 % https://textkool.com/en/ascii-art-generator?hl=default&vl=default&font=Big&text=Player%201%20Won%20%20%20!!

@@ -140,11 +140,14 @@ valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line)
 % Lidx_f-Cidx_f is the final position.
 %
 % A move is valid if it is either a horizontal or vertical move and all the cells in the path are empty.
-valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
-                                                  valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i).
+% Furthermore, the move is valid if the initial position is different from the final one.
+valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_i \== Lidx_f,
+                                                  (valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
+                                                  valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i)).
 
-valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
-                                                  valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f).
+valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_i \== Cidx_f,
+                                                  (valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
+                                                  valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f)).
 
 % check_valid_move(+Board, +L-C, +LineDest-ColumnDest)
 % Checks if a move is valid, and if not, writes a message to the user.

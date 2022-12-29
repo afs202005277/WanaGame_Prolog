@@ -16,21 +16,21 @@ start_board([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
-% size(-Size:integer) is det
+% size(-Size:integer)
 % Initializes the size of the game board as an integer.
 size(9).
 
-% player(-Player:atom) is nondet
+% player(-Player:atom)
 % Yields the atoms representing the players.
 player(player1).
 player(player2).
 
-% marbles(+Player:atom, -Marbles:list(atom)) is det
+% marbles(+Player:atom, -Marbles:list(atom))
 % Returns a list of atoms representing the marbles of a player.
 marbles(player1, [player1_1, player1_2, player1_3, player1_4, player1_5, player1_6, player1_7, player1_8]).
 marbles(player2, [player2_1, player2_2, player2_3, player2_4, player2_5, player2_6, player2_7, player2_8]).
 
-% gamemode(+Option:integer, -GameMode:atom) is semidet
+% gamemode(+Option:integer, -GameMode:atom)
 % Validates an integer as a game mode option (1, 2, 3, or 4).
 % Returns the corresponding game mode atom.
 % Fails if the option is invalid.
@@ -44,7 +44,8 @@ gamemode(4, cVc).
 % Returns the corresponding level atom.
 % Fails if the option is invalid.
 ai_level(1, easy).
-ai_level(2, hard).
+ai_level(2, medium).
+ai_level(3, hard).
 
 % next_player(+Player:atom, -NextPlayer:atom) is det
 % Returns the next player in the game based on the current player.

@@ -147,4 +147,6 @@ best_move_ai(easy, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Playe
                                                                 choose_from_list(Ins, N2, LineMove-ColumnMove),
                                                                 choose_from_list(MarblesNames, N1, Marble).
 
-best_move_ai(hard, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 2, 0, Marble, LineMove-ColumnMove, _).
+best_move_ai(medium, Board, Player, Marble, LineMove-ColumnMove):- write('medium\n'), minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, _).
+
+best_move_ai(hard, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 1, 0, Marble, LineMove-ColumnMove, _).
