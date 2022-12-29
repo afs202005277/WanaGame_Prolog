@@ -115,11 +115,11 @@ start_menu(GameMode):- write('Greetings! This is our implementation of the Wana 
 % Prompts the user to select an AI level from a list of options.
 % Reads the input from the standard input stream.
 % Validates the input and fails
-set_ai_level(Level):- write('In our game you can choose one of 2 levels:\n'),
+set_ai_level(Level):- write('In our game you can choose one of 3 levels:\n'),
                  write('1- Easy\n'),
                  write('2- Medium\n'),
                  write('3- Hard\n'),
-                 write('Pease select one of the levels: '),
+                 write('Please select one of the levels: '),
                  repeat,
                  read_number(Option),
                  get_code(10),
