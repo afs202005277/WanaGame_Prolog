@@ -16,6 +16,18 @@ start_board([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
+test_board([
+        [block, block, block, player1_1, empty, player2_2, block, block, block],
+        [block, block, block, player2_3, empty, empty, block, block, block],
+        [block, block, block, empty, empty, player2_6, block, block, block],
+        [empty, player1_3, empty, player2_7, empty, player2_8, player1_6, empty, empty],
+        [player2_1, empty, empty, empty, empty, empty, player1_5, player2_4, player1_2],
+        [empty, empty, empty, player1_7, empty, player1_8, player2_5, empty, empty],
+        [block, block, block, empty, empty, empty, block, block, block],
+        [block, block, block, empty, empty, player1_4, block, block, block],
+        [block, block, block, empty, empty, empty, block, block, block]
+        ]).
+
 curve([2-3, 2-4, 2-5, 3-6, 4-6, 5-6, 6-5, 6-4, 6-3, 5-2, 4-2, 3-2]).
 curve([1-3, 1-4, 1-5, 3-7, 4-7, 5-7, 7-5, 7-4, 7-3, 5-1, 4-1, 3-1]).
 curve([0-3, 0-4, 0-5, 3-8, 4-8, 5-8, 8-5, 8-4, 8-3, 5-0, 4-0, 3-0]).
@@ -93,7 +105,7 @@ get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board
 % The board is represented as a list of lists of atoms, and the positions are given as a list of pairs of integers.
 % Fails if at least one marble has no valid moves.
 check_all_moves(_, []).
-check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),
+check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),!,
                                      \+length(Res, 0),
                                      check_all_moves(Board, Tail).
 
@@ -107,7 +119,7 @@ make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-C
                                      check_valid_move(Board, L-C, LineDest-ColumnDest),
                                      move(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
 
-remove_prev_move(Marble):- retract(prev_move(Marble, _-_, _-_)).
+remove_prev_move(Marble):- retractall(prev_move(Marble, _-_, _-_)), !.
 remove_prev_move(_).
 
 % make_move_ai(+Difficulty:atom, +Player:atom, +Board:list(list(atom)), -NewBoard:list(list(atom)))
@@ -146,20 +158,30 @@ game_cycle_wrapper(cVc, Board-Player):- set_ai_level(Level1),
                                         assert(bot_difficulty(player2, Level2)),
                                         game_cycle(cVc, Board-Player).
 
+debug(Board, Positions):- \+length(Positions, 8),
+                           write(Positions),
+                           display_game(Board).
+
+debug(_, Positions):- length(Positions, 8).
+
 % game_over(+Board:list(list(atom)), +Player:atom) 
 % Determines if the game is over for the given player.
 % The board is represented as a list of lists of atoms and the player is an atom.
 game_over(Board, Player):- marbles(Player, MarblesNames),
-                           get_all_positions(Board, MarblesNames, Positions),
+                           get_all_positions(Board, MarblesNames, Positions),!,
+                           debug(Board, Positions),
                            \+check_all_moves(Board, Positions).
 
 % game_cycle(+GameMode:atom, +Board-Player:pair(list(list(atom)), atom)) 
 % Main game loop for the different game modes.
 % The game mode is an atom and the board and current player are represented as a pair (list of lists of atoms and atom).
 game_cycle(_, Board-Player):-game_over(Board, Player), !,
+                                findall(Marble-L1-C1-L2-C2, prev_move(Marble, L1-C1, L2-C2), X), write(X),
                            next_player(Player, NextPlayer),
                            congratulate(NextPlayer),
-                           retractall(bot_difficulty(_, _)).
+                           retractall(bot_difficulty(_, _)),
+                           retractall(prev_move(_, _-_, _-_)),
+                           assert(prev_move(player0_0, 0-0, 0-0)).
 
 game_cycle(hVh, Board-Player):- repeat,
                            make_move(Player, Board, NewBoard),
@@ -190,9 +212,14 @@ game_cycle(cVh, Board-player2):- repeat,
                                  game_cycle(cVh, NewBoard-NextPlayer).
 
 game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
+                                write('p1\n'),
                                 make_move_ai(Level, Player, Board, NewBoard),
+                                write('p2\n'),
                                 next_player(Player, NextPlayer),
+                                write('p3\n'),
                                 write(Player), write(' played!\n\n'),
                                 display_game(NewBoard),
-                                game_cycle(cVc, NewBoard-NextPlayer).
+                                write('p4\n'),
+                                game_cycle(cVc, NewBoard-NextPlayer),
+                                write('p5\n').
 
