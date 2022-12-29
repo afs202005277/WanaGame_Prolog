@@ -1,15 +1,19 @@
+% Gets all the valid moves from a given list of positions
 get_all_moves_from_all_pos(_, [], []).
 get_all_moves_from_all_pos(Board, [L-C|Rest], Moves):-  get_all_moves_from_pos(Board, L-C, M1), 
                                                         get_all_moves_from_all_pos(Board, Rest, M2), 
                                                         append([M1], M2, Moves).
 
+% Gets the list in a given index from a multidmensional array
 choose_from_list([], _, []).
 choose_from_list([A|_], 0, A).
 choose_from_list([_|Rest], X, RetList):- length(Rest, S), Size is S+1, X<Size, X>0, X1 is X-1, choose_from_list(Rest, X1, RetList).
 
+% Sums all the values in a list
 movesSum([], 0).
 movesSum([A|Rest], Score) :- movesSum(Rest, S1), length(A, M), Score is S1+M.
 
+% Calculates the evaluation score of a given board
 evaluationScore(Board, Player, Score):- marbles(Player, MarblesPlayer),
                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
                                         get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
@@ -21,6 +25,7 @@ evaluationScore(Board, Player, Score):- marbles(Player, MarblesPlayer),
                                         movesSum(MovesOpponent, S2),
                                         Score is S1-S2.
 
+% Auxiliary function used in all_boards that makes the given moves and returns boards
 all_boards_aux(_, _, _, [], []).
 all_boards_aux(Board, Player, Marble, [L-C|RestListOfMoves], NewBoards):- findIndexesBoard(Board, Marble, L_ini-C_ini), 
                                                                           insert_in_board(Board, Marble, L, C, NB1), 
@@ -28,18 +33,22 @@ all_boards_aux(Board, Player, Marble, [L-C|RestListOfMoves], NewBoards):- findIn
                                                                           all_boards_aux(Board, Player, Marble, RestListOfMoves, Res),
                                                                           append([NewBoard], Res, NewBoards).
 
+% Gets all the boards possible from a list of marbles and a list of designated moves
 all_boards(_, _, _, [], []).
 all_boards(Board, Player, [FirstMarble|RestMarbles], [First|RestMoves], NewBoards):- all_boards_aux(Board, Player, FirstMarble, First, Res), 
                                                                                      all_boards(Board, Player, RestMarbles, RestMoves, Res2),
                                                                                      append([Res], Res2, NewBoards).
 
+% Returns an array of Evaluation Scores from an array of Boards
 allEvaluationScore([], _, []).
 allEvaluationScore([A|Rest], Player, Scores):- evaluationScore(A, Player, S1), allEvaluationScore(Rest, Player, S2), append([S1], S2, Scores).
 
+% Returns a multidimensional array of Scores from a multidimensional array of boards
 sublistBestEvaluationScore([], _, [], []).
 sublistBestEvaluationScore([[]|Rest], Player, Scores, Is):- sublistBestEvaluationScore(Rest, Player, Scores, Is).
 sublistBestEvaluationScore([A|Rest], Player, Scores, Is):- allEvaluationScore(A, Player, S1), max_list(S1, M, I), sublistBestEvaluationScore(Rest, Player, S2, Is1), append([M], S2, Scores), append([I], Is1, Is).
 
+% Calls minimax recursively and returns an array of evaluation score from an array of Boards
 depthMinimaxCalls([], _, _, _, [], []).
 
 depthMinimaxCalls([A|Rest], Player, Depth, 1, LCs, Scores):-   minimax(A, Player, Depth, 1, M, LM-CM, S1),
@@ -52,6 +61,7 @@ depthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-   minimax(A, Player
                                                                 append([LM-CM], TmpLCs, LCs),
                                                                 append([S1], TmpScores, Scores).
 
+% Calls minimax recursively and returns an multidimensional array of evaluation scores from a multidimensional array of Boards
 sublistDepthMinimaxCalls([], _, _, _, [], []).
 sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, LCs, Scores):-     depthMinimaxCalls(A, Player, Depth, 1, LCs1, Scores1),
                                                                         sublistDepthMinimaxCalls(Rest, Player, Depth, 1, LCs2, Scores2),
@@ -63,6 +73,7 @@ sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-     depthMin
                                                                         append([Scores1], Scores2, Scores),
                                                                         append([LCs1], LCs2, LCs).
 
+% Minimax algorithm, receives the current board, the player, the depth and if it is the current's player turn and returns the best move possible.
 minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
@@ -89,15 +100,18 @@ minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      next_pla
                                                                         nth0(I, MovesOpponentPlayer, TmpMoves),
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
+% Auxiliary 'map' function that works with multidimensional arrays
 mapDoubleList(_, [], []).
 mapDoubleList(Pred, [H|T], [M|Ms]) :-
     call(Pred, H, M, _),
     mapDoubleList(Pred, T, Ms).
 
+% Auxiliary function that gets the index of the list that has the maximum value
 max_list_index(Lists, Index) :-
     mapDoubleList(max_list, Lists, Maxes),
     max_list(Maxes, Max, Index).
 
+% Auxiliary function that gets the index of the list that has the minimum value
 min_list_index(Lists, Index) :-
     mapDoubleList(min_list, Lists, Mins),
     max_list(Mins, Min, Index).
@@ -130,6 +144,7 @@ minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_pla
                                                                         nth0(I, MarbleMoves, LineMove-ColumnMove),
                                                                         nth0(MarbleInd, MarblesOpponentPlayer, Marble).
 
+% Function that decides the best move, easy -> does random move, hard -> uses the minimax algorithm
 best_move_ai(easy, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
                                                                 get_all_positions(Board, MarblesNames, Positions),
                                                                 get_all_moves_from_all_pos(Board, Positions, Moves),
