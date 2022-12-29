@@ -80,7 +80,7 @@ sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-     depthMin
                                                                         append([LCs1], LCs2, LCs).
 
 % Minimax algorithm, receives the current board, the player, the depth and if it is the current's player turn and returns the best move possible.
-minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
+minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
                                                                         all_boards(Board, Player, MarblesPlayer, MP, NewBoards),
@@ -93,7 +93,7 @@ minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      marbles(
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
 
-minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      next_player(Player, OpponentPlayer),
+minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      next_player(Player, OpponentPlayer),
                                                                         marbles(OpponentPlayer, MarblesOpponentPlayer),
                                                                         get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MOP),
@@ -168,6 +168,6 @@ best_move_ai(easy, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Playe
                                                                 choose_from_list(Ins, N2, LineMove-ColumnMove),
                                                                 choose_from_list(MarblesNames, N1, Marble).
 
-best_move_ai(medium, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, _).
+best_move_ai(medium, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, _).
 
 best_move_ai(hard, Board, Player, Marble, LineMove-ColumnMove):- minimax(Board, Player, 1, 0, Marble, LineMove-ColumnMove, _).

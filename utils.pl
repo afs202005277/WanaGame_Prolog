@@ -91,3 +91,15 @@ marble_naming(Player, Marble, Res) :- append("_", Marble, Suffix),
 clear_input:-peek_char('\n'), get_char(_), !.
 clear_input:- get_code(_),
               clear_input.
+
+find_curve(Li-Ci, Lf-Cf, IndexFirstElement, IndexSecondElement, Curve):- curve(Curve),
+                                                                        nth0(IndexFirstElement, Curve, Li-Ci),
+                                                                        nth0(IndexSecondElement, Curve, Lf-Cf).
+
+convert_to_board_elements(_, [], []).
+convert_to_board_elements(Board, [L-C|Rest], Elements):- nth0(L, Board, Line),
+                                                         nth0(C, Line, Element),
+                                                         convert_to_board_elements(Board, Rest, Res),
+                                                         append([Element], Res, Elements).
+
+                                  

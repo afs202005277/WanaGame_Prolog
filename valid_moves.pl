@@ -1,37 +1,3 @@
-% get_new_value_left(+LineIndex, +CurrentColIndex, -NewColIndex)
-% Computes the new column index after a move to the left.
-% LineIndex is the current row index.
-% CurrentColIndex is the current column index.
-% NewColIndex is the new column index after the move.
-%
-% The new column index is computed as follows:
-%   - If LineIndex < 3, then NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
-%   - If LineIndex > 5, then NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
-%   - If LineIndex is between 3 and 5 (inclusive), then NewColIndex is (CurrentColIndex-1) mod 9.
-get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
-                                                              NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
-
-get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
-                                                              NewColIndex is 3 + ((CurrentColIndex-1) mod 3).
-
-get_new_value_left(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex-1) mod 9.
-
-% get_new_value_right(+LineIndex, +CurrentColIndex, -NewColIndex)
-% Computes the new column index after a move to the right.
-% LineIndex is the current row index.
-% CurrentColIndex is the current column index.
-% NewColIndex is the new column index after the move.
-%
-% The new column index is computed as follows:
-%   - If LineIndex < 3, then NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
-%   - If LineIndex > 5, then NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
-%   - If LineIndex is between 3 and 5 (inclusive), then NewColIndex is (CurrentColIndex+1) mod 9.
-get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex < 3,
-                                                              NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
-get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex > 5,
-                                                              NewColIndex is 3 + ((CurrentColIndex+1) mod 3).
-get_new_value_right(LineIndex, CurrentColIndex, NewColIndex):- LineIndex >= 3, LineIndex =< 5, NewColIndex is (CurrentColIndex+1) mod 9.
-
 % get_new_value_up(+LineIndex, +CurrentColIndex, -NewLineIndex)
 % Computes the new row index after a move up.
 % LineIndex is the current row index.
@@ -81,7 +47,8 @@ get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >
 valid_move_left(_, X-Y, X-Y).
 valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
                                                        nth0(Cidx_f, Line, empty),
-                                                       get_new_value_left(Lidx_i, Cidx_f, NewY),
+                                                       length(Line, Length),
+                                                       NewY is (Cidx_f-1) mod Length,
                                                        valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
 % valid_move_right(+Board, +Lidx_i-Cidx_i, +Lidx_i-Cidx_f)
@@ -97,7 +64,8 @@ valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line)
 valid_move_right(_, X-Y, X-Y).
 valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- nth0(Lidx_i, Board, Line),
                                                   nth0(Cidx_f, Line, empty),
-                                                  get_new_value_right(Lidx_i, Cidx_f, NewY),
+                                                  length(Line, Length),
+                                                  NewY is (Cidx_f+1) mod Length,
                                                   valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-NewY).
 
 % valid_move_up(+Board, +Lidx_i-Cidx_i, +Lidx_f-Cidx_i)
@@ -148,6 +116,11 @@ valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_i \== Lidx_f,
 valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_i \== Cidx_f,
                                                   (valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
                                                   valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f)).
+
+valid_move(Board, Li-Ci, Lf-Cf):- find_curve(Li-Ci, Lf-Cf, IndexFirst, IndexSecond, Curve),
+                                  convert_to_board_elements(Board, Curve, Elements),
+                                  (valid_move_right([Elements], 0-IndexFirst, 0-IndexSecond);
+                                  valid_move_left([Elements], 0-IndexFirst, 0-IndexSecond)).
 
 % check_valid_move(+Board, +L-C, +LineDest-ColumnDest)
 % Checks if a move is valid, and if not, writes a message to the user.
