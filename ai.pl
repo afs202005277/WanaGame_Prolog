@@ -13,6 +13,12 @@ choose_from_list([_|Rest], X, RetList):- length(Rest, S), Size is S+1, X<Size, X
 movesSum([], 0).
 movesSum([A|Rest], Score) :- movesSum(Rest, S1), length(A, M), Score is S1+M.
 
+
+evaluationScore(Board, Player, -10000000):- game_over(Board, Player), !;
+
+evaluationScore(Board, Player, 10000000):-  next_player(Player, OpponentPlayer),
+                                            game_over(Board, OpponentPlayer), !;
+
 % Calculates the evaluation score of a given board
 evaluationScore(Board, Player, Score):- marbles(Player, MarblesPlayer),
                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
