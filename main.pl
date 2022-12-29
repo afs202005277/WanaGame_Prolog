@@ -1,5 +1,5 @@
 :-use_module(library(lists)), use_module(library(random)), use_module(library(between)).
-:-dynamic bot_difficulty/2.
+:-dynamic bot_difficulty/2, prev_move/3.
 :- ['io.pl', 'utils.pl', 'ai.pl', 'valid_moves.pl'].
 
 % start_board(-Board:list(list(atom))) 
@@ -23,6 +23,8 @@ curve([0-3, 0-4, 0-5, 3-8, 4-8, 5-8, 8-5, 8-4, 8-3, 5-0, 4-0, 3-0]).
 % size(-Size:integer)
 % Initializes the size of the game board as an integer.
 size(9).
+
+prev_move(player0_0, 0-0, 0-0).
 
 % player(-Player:atom)
 % Yields the atoms representing the players.
@@ -105,15 +107,16 @@ make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-C
                                      check_valid_move(Board, L-C, LineDest-ColumnDest),
                                      move(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
 
+remove_prev_move(Marble):- retract(prev_move(Marble, _-_, _-_)).
+remove_prev_move(_).
+
 % make_move_ai(+Difficulty:atom, +Player:atom, +Board:list(list(atom)), -NewBoard:list(list(atom)))
 % Makes a move for an AI player and returns the resulting board.
 % The difficulty level is an atom, the board is represented as a list of lists of atoms, and the player is an atom.
 make_move_ai(Difficulty, Player, Board, NewBoard):- best_move_ai(Difficulty, Board, Player, Marble, LineMove-ColumnMove),
-                                                write(Difficulty),nl,
-                                                write(LineMove-ColumnMove),
-                                                write('  '),
-                                                write(Marble),nl,
                                               findIndexesBoard(Board, Marble, Line-Column),
+                                              remove_prev_move(Marble),
+                                              assert(prev_move(Marble, Line-Column, LineMove-ColumnMove)),
                                               insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
                                               insert_in_board(NB1, empty, Line, Column, NewBoard).
 

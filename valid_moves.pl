@@ -110,14 +110,24 @@ valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line)
 % A move is valid if it is either a horizontal or vertical move and all the cells in the path are empty.
 % Furthermore, the move is valid if the initial position is different from the final one.
 valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_i \== Lidx_f,
+                                                  nth0(Lidx_i, Board, Line),
+                                                  nth0(Cidx_i, Line, Marble),
+                                                  \+prev_move(Marble, Lidx_f-Cidx_i, Lidx_i-Cidx_i),
                                                   (valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
                                                   valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i)).
 
 valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_i \== Cidx_f,
+                                                  nth0(Lidx_i, Board, Line),
+                                                  nth0(Cidx_i, Line, Marble),
+                                                  \+prev_move(Marble, Lidx_i-Cidx_f, Lidx_i-Cidx_i),
                                                   (valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
                                                   valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f)).
 
-valid_move(Board, Li-Ci, Lf-Cf):- find_curve(Li-Ci, Lf-Cf, IndexFirst, IndexSecond, Curve),
+valid_move(Board, Li-Ci, Lf-Cf):- Li-Ci \== Lf-Cf,
+                                  nth0(Li, Board, Line),
+                                  nth0(Ci, Line, Marble),
+                                  \+prev_move(Marble, Lf-Cf, Li-Ci),
+                                  find_curve(Li-Ci, Lf-Cf, IndexFirst, IndexSecond, Curve),
                                   convert_to_board_elements(Board, Curve, Elements),
                                   (valid_move_right([Elements], 0-IndexFirst, 0-IndexSecond);
                                   valid_move_left([Elements], 0-IndexFirst, 0-IndexSecond)).
