@@ -36,7 +36,7 @@ curve([0-3, 0-4, 0-5, 3-8, 4-8, 5-8, 8-5, 8-4, 8-3, 5-0, 4-0, 3-0]).
 % Initializes the size of the game board as an integer.
 size(9).
 
-prev_move(player0_0, 0-0, 0-0).
+prev_move(player0, 0-0, 0-0).
 
 % player(-Player:atom)
 % Yields the atoms representing the players.
@@ -127,8 +127,8 @@ remove_prev_move(_).
 % The difficulty level is an atom, the board is represented as a list of lists of atoms, and the player is an atom.
 make_move_ai(Difficulty, Player, Board, NewBoard):- best_move_ai(Difficulty, Board, Player, Marble, LineMove-ColumnMove),
                                               findIndexesBoard(Board, Marble, Line-Column),
-                                              remove_prev_move(Marble),
-                                              assert(prev_move(Marble, Line-Column, LineMove-ColumnMove)),
+                                              remove_prev_move(Player),
+                                              assert(prev_move(Player, Line-Column, LineMove-ColumnMove)),
                                               insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
                                               insert_in_board(NB1, empty, Line, Column, NewBoard).
 
@@ -212,14 +212,11 @@ game_cycle(cVh, Board-player2):- repeat,
                                  game_cycle(cVh, NewBoard-NextPlayer).
 
 game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
-                                write('p1\n'),
                                 make_move_ai(Level, Player, Board, NewBoard),
-                                write('p2\n'),
+                                evaluationScore(NewBoard, Player, Score),
+                                write(Score),nl,
                                 next_player(Player, NextPlayer),
-                                write('p3\n'),
                                 write(Player), write(' played!\n\n'),
                                 display_game(NewBoard),
-                                write('p4\n'),
-                                game_cycle(cVc, NewBoard-NextPlayer),
-                                write('p5\n').
+                                game_cycle(cVc, NewBoard-NextPlayer).
 

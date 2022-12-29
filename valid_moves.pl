@@ -1,3 +1,5 @@
+check_new_move(Marble, Li-Ci, Lf-Cf):- sub_atom(Marble, 0, 7, _, Player), \+prev_move(Player, Lf-Cf, Li-Ci).
+
 % get_new_value_up(+LineIndex, +CurrentColIndex, -NewLineIndex)
 % Computes the new row index after a move up.
 % LineIndex is the current row index.
@@ -112,21 +114,21 @@ valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- nth0(Lidx_f, Board, Line)
 valid_move(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i):- Lidx_i \== Lidx_f,
                                                   nth0(Lidx_i, Board, Line),
                                                   nth0(Cidx_i, Line, Marble),
-                                                  \+prev_move(Marble, Lidx_f-Cidx_i, Lidx_i-Cidx_i),
+                                                  check_new_move(Marble, Lidx_f-Cidx_i, Lidx_i-Cidx_i),
                                                   (valid_move_up(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i);
                                                   valid_move_down(Board, Lidx_i-Cidx_i, Lidx_f-Cidx_i)).
 
 valid_move(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f):- Cidx_i \== Cidx_f,
                                                   nth0(Lidx_i, Board, Line),
                                                   nth0(Cidx_i, Line, Marble),
-                                                  \+prev_move(Marble, Lidx_i-Cidx_f, Lidx_i-Cidx_i),
+                                                  check_new_move(Marble, Lidx_i-Cidx_f, Lidx_i-Cidx_i),
                                                   (valid_move_left(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f);
                                                   valid_move_right(Board, Lidx_i-Cidx_i, Lidx_i-Cidx_f)).
 
 valid_move(Board, Li-Ci, Lf-Cf):- Li-Ci \== Lf-Cf,
                                   nth0(Li, Board, Line),
                                   nth0(Ci, Line, Marble),
-                                  \+prev_move(Marble, Lf-Cf, Li-Ci),
+                                  check_new_move(Marble, Lf-Cf, Li-Ci),
                                   find_curve(Li-Ci, Lf-Cf, IndexFirst, IndexSecond, Curve),
                                   convert_to_board_elements(Board, Curve, Elements),
                                   (valid_move_right([Elements], 0-IndexFirst, 0-IndexSecond);
