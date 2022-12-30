@@ -14,7 +14,7 @@ movesSum([], 0).
 movesSum([A|Rest], Score) :- movesSum(Rest, S1), length(A, M), Score is S1+M.
 
 
-evaluationScore(Board, Player, -10000000):- game_over(Board, Player), !.
+evaluationScore(Board, Player, -1000):- game_over(Board, Player), !.
 
 evaluationScore(Board, Player, 10000000):-  next_player(Player, OpponentPlayer),
                                             game_over(Board, OpponentPlayer), !.
@@ -49,35 +49,39 @@ all_boards(Board, Player, [FirstMarble|RestMarbles], [First|RestMoves], NewBoard
 allEvaluationScore([], _, []).
 allEvaluationScore([A|Rest], Player, Scores):- evaluationScore(A, Player, S1), allEvaluationScore(Rest, Player, S2), append([S1], S2, Scores).
 
+% reconsult('main.pl'), start_board(B), minimax(B, player1, 1, 0, M, L-C, S).
+
 % Returns a multidimensional array of Scores from a multidimensional array of boards
 sublistBestEvaluationScore([], _, [], []).
 sublistBestEvaluationScore([[]|Rest], Player, Scores, Is):- sublistBestEvaluationScore(Rest, Player, Scores, Is).
 sublistBestEvaluationScore([A|Rest], Player, Scores, Is):- allEvaluationScore(A, Player, S1), max_list(S1, M, I), sublistBestEvaluationScore(Rest, Player, S2, Is1), append([M], S2, Scores), append([I], Is1, Is).
 
 % Calls minimax recursively and returns an array of evaluation score from an array of Boards
-depthMinimaxCalls([], _, _, _, [], []).
+depthMinimaxCalls([], _, _, _, []).
 
-depthMinimaxCalls([A|Rest], Player, Depth, 1, LCs, Scores):-   minimax(A, Player, Depth, 1, M, LM-CM, S1),
-                                                                depthMinimaxCalls(Rest, Player, Depth, 1, TmpLCs, TmpScores),
-                                                                append([LM-CM], TmpLCs, LCs),
-                                                                append([S1], TmpScores, Scores).
 
-depthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-   minimax(A, Player, Depth, 0, M, LM-CM, S1),
-                                                                depthMinimaxCalls(Rest, Player, Depth, 0, TmpLCs, TmpScores),
-                                                                append([LM-CM], TmpLCs, LCs),
-                                                                append([S1], TmpScores, Scores).
+depthMinimaxCalls([A|Rest], Player, Depth, 1, NewBoards):-      next_player(Player, OppPlayer),
+                                                                minimax(A, OppPlayer, Depth, 0, M, LM-CM, _),
+                                                                atom_concat(MPlayer, N, M), atom_length(N, 1), atom_codes(N, TmpNumber), MarbleID is TmpNumber-48,
+                                                                move(OppPlayer, MarbleID, A, LM-CM, NB),
+                                                                depthMinimaxCalls(Rest, Player, Depth, 1, TmpNewBoards),
+                                                                append([NB], TmpNewBoards, NewBoards).
+
+depthMinimaxCalls([A|Rest], Player, Depth, 0, NewBoards):-      minimax(A, Player, Depth, 0, M, LM-CM, _),
+                                                                atom_concat(MPlayer, N, M), atom_length(N, 1), atom_codes(N, TmpNumber), MarbleID is TmpNumber-48,
+                                                                move(Player, MarbleID, A, LM-CM, NB),
+                                                                depthMinimaxCalls(Rest, Player, Depth, 0, TmpNewBoards),
+                                                                append([NB], TmpNewBoards, NewBoards).
 
 % Calls minimax recursively and returns an multidimensional array of evaluation scores from a multidimensional array of Boards
-sublistDepthMinimaxCalls([], _, _, _, [], []).
-sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, LCs, Scores):-     depthMinimaxCalls(A, Player, Depth, 1, LCs1, Scores1),
-                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 1, LCs2, Scores2),
-                                                                        append([LCs1], LCs2, LCs),
-                                                                        append([Scores1], Scores2, Scores).
+sublistDepthMinimaxCalls([], _, _, _, []).
+sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, NextMoveBoards):-      depthMinimaxCalls(A, Player, Depth, 1, Boards),
+                                                                            sublistDepthMinimaxCalls(Rest, Player, Depth, 1, TmpNextMoveBoards),
+                                                                            append([Boards], TmpNextMoveBoards, NextMoveBoards).
 
-sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, LCs, Scores):-     depthMinimaxCalls(A, Player, Depth, 0, LCs1, Scores1),
-                                                                        sublistDepthMinimaxCalls(Rest, Player, Depth, 0, LCs2, Scores2),
-                                                                        append([Scores1], Scores2, Scores),
-                                                                        append([LCs1], LCs2, LCs).
+sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, NextMoveBoards):-      depthMinimaxCalls(A, Player, Depth, 0, Boards),
+                                                                            sublistDepthMinimaxCalls(Rest, Player, Depth, 0, TmpNextMoveBoards),
+                                                                            append([Boards], TmpNextMoveBoards, NextMoveBoards).
 
 % Minimax algorithm, receives the current board, the player, the depth and if it is the current's player turn and returns the best move possible.
 minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
@@ -125,30 +129,38 @@ min_list_index(Lists, Index) :-
 
 minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
-                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MovesPlayer),
-                                                                        all_boards(Board, Player, MarblesPlayer, MovesPlayer, NewBoards),
+                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
+                                                                        all_boards(Board, Player, MarblesPlayer, MP, NewBoards),
                                                                         D1 is Depth-1,
-                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 1, LCs, Scores),
-                                                                        max_list_index(Scores, MarbleInd),
-                                                                        nth0(MarbleInd, Scores, MarbleScores),
-                                                                        nth0(MarbleInd, MovesPlayer, MarbleMoves),
-                                                                        max_list(MarbleScores, Score, I),
-                                                                        nth0(I, MarbleMoves, LineMove-ColumnMove),
-                                                                        nth0(MarbleInd, MarblesPlayer, Marble).
+                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 1, NextMoveBoards),
+                                                                        del_all([], MP, MovesPlayer),
+                                                                        sublistBestEvaluationScore(NextMoveBoards, Player, TmpScores, Is),
+                                                                        max_list(TmpScores, Score, I),
+                                                                        nth0(I, MarblesPlayer, Marble),
+                                                                        nth0(I, Is, TmpI),
+                                                                        nth0(I, MovesPlayer, TmpMoves),
+                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove),
+                                                                        nl, write(Is), nl,
+                                                                        nl, write(TmpScores), nl,
+                                                                        nl, write(MovesPlayer), nl.
 
 minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_player(Player, OpponentPlayer),
                                                                         marbles(OpponentPlayer, MarblesOpponentPlayer),
                                                                         get_all_positions(Board, MarblesOpponentPlayer, PositionsOpponentPlayer),
-                                                                        get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MovesOpponentPlayer),
-                                                                        all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MovesOpponentPlayer, NewBoards),
+                                                                        get_all_moves_from_all_pos(Board, PositionsOpponentPlayer, MOP),
+                                                                        all_boards(Board, OpponentPlayer, MarblesOpponentPlayer, MOP, NewBoards),
                                                                         D1 is Depth-1,
-                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 0, LCs, Scores),
-                                                                        min_list_index(Scores, MarbleInd),
-                                                                        nth0(MarbleInd, Scores, MarbleScores),
-                                                                        nth0(MarbleInd, MovesOpponentPlayer, MarbleMoves),
-                                                                        min_list(MarbleScores, Score, I),
-                                                                        nth0(I, MarbleMoves, LineMove-ColumnMove),
-                                                                        nth0(MarbleInd, MarblesOpponentPlayer, Marble).
+                                                                        sublistDepthMinimaxCalls(NewBoards, Player, D1, 0, NextMoveBoards),
+                                                                        del_all([], MOP, MovesOpponentPlayer),
+                                                                        sublistBestEvaluationScore(NextMoveBoards, Player, TmpScores, Is),
+                                                                        min_list(TmpScores, Score, I),
+                                                                        nth0(I, MarblesOpponentPlayer, Marble),
+                                                                        nth0(I, Is, TmpI),
+                                                                        nth0(I, MovesOpponentPlayer, TmpMoves),
+                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove),
+                                                                        nl, write(Is), nl,
+                                                                        nl, write(TmpScores), nl,
+                                                                        nl, write(MovesOpponentPlayer), nl.
 
 % Function that decides the best move, easy -> does random move, hard -> uses the minimax algorithm
 best_move_ai(easy, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),

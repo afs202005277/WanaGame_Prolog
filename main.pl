@@ -87,7 +87,7 @@ get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, 
 % Makes a move on the board for a given player and marble, and returns the resulting board.
 % The board is represented as a list of lists of atoms, the player is an atom, the marble is an atom, and the coordinates are given as a pair of integers.
 % Fails if the move is not valid.
-move(Player, Marble, Board, Line-Column, NewBoard):-     atom_string(Player, PlayerString),
+move(Player, Marble, Board, Line-Column, NewBoard):-            atom_string(Player, PlayerString),
                                                                 atom_string_number(Marble, MarbleString),
                                                                 get_marble_position(PlayerString, MarbleString, Board, L-C),
                                                                 valid_move(Board, L-C, Line-Column),
@@ -169,7 +169,6 @@ debug(_, Positions):- length(Positions, 8).
 % The board is represented as a list of lists of atoms and the player is an atom.
 game_over(Board, Player):- marbles(Player, MarblesNames),
                            get_all_positions(Board, MarblesNames, Positions),!,
-                           debug(Board, Positions),
                            \+check_all_moves(Board, Positions).
 
 % game_cycle(+GameMode:atom, +Board-Player:pair(list(list(atom)), atom)) 
