@@ -139,10 +139,7 @@ minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(
                                                                         nth0(I, MarblesPlayer, Marble),
                                                                         nth0(I, Is, TmpI),
                                                                         nth0(I, MovesPlayer, TmpMoves),
-                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove),
-                                                                        nl, write(Is), nl,
-                                                                        nl, write(TmpScores), nl,
-                                                                        nl, write(MovesPlayer), nl.
+                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
 minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_player(Player, OpponentPlayer),
                                                                         marbles(OpponentPlayer, MarblesOpponentPlayer),
@@ -157,10 +154,7 @@ minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_pla
                                                                         nth0(I, MarblesOpponentPlayer, Marble),
                                                                         nth0(I, Is, TmpI),
                                                                         nth0(I, MovesOpponentPlayer, TmpMoves),
-                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove),
-                                                                        nl, write(Is), nl,
-                                                                        nl, write(TmpScores), nl,
-                                                                        nl, write(MovesOpponentPlayer), nl.
+                                                                        nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
 % Function that decides the best move, easy -> does random move, hard -> uses the minimax algorithm
 best_move_ai(easy, Board, Player, Marble, LineMove-ColumnMove):-   marbles(Player, MarblesNames),
