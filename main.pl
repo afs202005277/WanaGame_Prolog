@@ -224,7 +224,6 @@ game_cycle(cVh, Board-player2):- repeat,
 
 game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
                                 make_move_ai(Level, Player, Board, NewBoard),
-                                evaluationScore(NewBoard, Player, Score),
                                 next_player(Player, NextPlayer),
                                 write(Player), write(' played!\n\n'),
                                 display_game(NewBoard),
