@@ -33,7 +33,7 @@ Finally, when the game mode envolves the computer (in the role of a player), we 
 ### Game state view
 When the user executes the "play/0" predicate, the program presents a menu with the different game modes and then asks the user to select one of them (if the user inputs a number that doesn't match a valid option, then an error message appears and the user has to remake the gamemode selection). After that, if the selected game mode isn't the human vs human mode, then the user will be prompted to set the difficulty of each level of AI. Finally, the board is displayed and the user is asked to select one of his marbles and then to make a move (if the move is invalid, an error message appears and the user is prompted to redo the move).
 
-![Initial Screen](./images/InitialScreen.png)
+![Initial Screen](./images/initialScreen.png)
 
 ### Moves Execution
 When the user selects a movement, the predicate "valid_move/3" is called. This predicate receives the current board, the initial position of the marble and the final one. After that, if the row index of the movement is equal in both the start position and the final position, the predicate checks if it is a valid left or right movement. If the row indexes are different but the column indexes are the same, then we know that it is a vertical movement and then we check if it is a valid upwards or downwards movement. If none of this cases apply, then the predicate checks if it is a valid non linear movement.
