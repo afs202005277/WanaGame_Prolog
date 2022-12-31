@@ -46,8 +46,7 @@ We implemented two variants of this functionallity:
 Our game_over/2 predicate receives the current board and the player that is going to make a move and succeeds if that player lost the game. We didn't follow the project's guide in this case, because the rules of the game clearly state that the player only loses if he cannot make a move in the beggining of his turn, therefore we didn't implement the proposal done in the guide since it doesn't consider which player is currently making a move.
 
 ### Board Evaluation
-# @PEDRO FONSECA VERIFICA SE ESTÁ CERTO E TALVEZ É PRECISO COMPLETAR A EXPLICAÇÃO
-Our evaluation predicate goes through each marble of the player and calculates the number of possible moves of each marble. The final score is the sum of all of these moves.
+Our evaluation predicate goes through each marble of the player and calculates the number of possible moves of each marble. The same is then done for the opponent. The final score is the sum of all of the player's moves minus the sum of all the opponent's moves. Our reasoning behind this score has to do with the game's goal: trap the other player's marbles; so by checking the amount of available moves we are guaranteeing the freedom of the player and therefore making sure that he is not being trapped in comparison with the other player.
 
 ### Computer Move
 In our game, we implemented three difficulty levels:
