@@ -10,13 +10,7 @@ check_new_move(Marble, Li-Ci, Lf-Cf):- sub_atom(Marble, 0, 7, _, Player), \+prev
 %   - If CurrentColIndex < 3, then NewLineIndex is 3 + ((LineIndex+1) mod 3).
 %   - If CurrentColIndex > 5, then NewLineIndex is 3 + ((LineIndex+1) mod 3).
 %   - If CurrentColIndex is between 3 and 5 (inclusive), then NewLineIndex is (LineIndex+1) mod 9.
-get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex < 3,
-                                                              NewLineIndex is 3 + ((LineIndex+1) mod 3).
-
-get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex > 5,
-                                                              NewLineIndex is 3 + ((LineIndex+1) mod 3).
-
-get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 3, CurrentColIndex =< 5, NewLineIndex is (LineIndex+1) mod 9.
+get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- NewLineIndex is (LineIndex+1) mod 9.
 
 % get_new_value_down(+LineIndex, +CurrentColIndex, -NewLineIndex)
 % Computes the new row index after a move down.
@@ -28,13 +22,8 @@ get_new_value_up(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 
 %   - If CurrentColIndex < 3, then NewLineIndex is 3 + ((LineIndex-1) mod 3).
 %   - If CurrentColIndex > 5, then NewLineIndex is 3 + ((LineIndex-1) mod 3).
 %   - If CurrentColIndex is between 3 and 5 (inclusive), then NewLineIndex is (LineIndex-1) mod 9.
-get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex < 3,
-                                                              NewLineIndex is 3 + ((LineIndex-1) mod 3).
 
-get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex > 5,
-                                                              NewLineIndex is 3 + ((LineIndex-1) mod 3).
-
-get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- CurrentColIndex >= 3, CurrentColIndex =< 5, NewLineIndex is (LineIndex-1) mod 9.
+get_new_value_down(LineIndex, CurrentColIndex, NewLineIndex):- NewLineIndex is (LineIndex-1) mod 9.
                                                               
 % valid_move_left(+Board, +Lidx_i-Cidx_i, +Lidx_i-Cidx_f)
 % Determines if a move from the initial position (Lidx_i-Cidx_i) to the final position (Lidx_i-Cidx_f) is valid.

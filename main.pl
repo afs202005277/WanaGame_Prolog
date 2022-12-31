@@ -16,16 +16,28 @@ start_board([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
-test_board([
-        [block, block, block, player1_1, empty, player2_2, block, block, block],
-        [block, block, block, player2_3, empty, empty, block, block, block],
-        [block, block, block, empty, empty, player2_6, block, block, block],
-        [empty, player1_3, empty, player2_7, empty, player2_8, player1_6, empty, empty],
-        [player2_1, empty, empty, empty, empty, empty, player1_5, player2_4, player1_2],
-        [empty, empty, empty, player1_7, empty, player1_8, player2_5, empty, empty],
+game_over_test([
+        [block, block, block, empty, empty, player2_2, block, block, block],
         [block, block, block, empty, empty, empty, block, block, block],
+        [block, block, block, empty, empty, empty, block, block, block],
+        [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
+        [empty, player2_3, player1_8, empty, empty, empty, player2_6, empty, empty],
+        [player2_1, player1_7, player2_5, player1_5, empty, empty, empty, player2_4, empty],
+        [block, block, block, player1_3, empty, player1_6, block, block, block],
         [block, block, block, empty, empty, player1_4, block, block, block],
-        [block, block, block, empty, empty, empty, block, block, block]
+        [block, block, block, player1_1, empty, player1_2, block, block, block]
+        ]).
+
+valid_moves([
+        [block, block, block, empty, empty, player2_2, block, block, block],
+        [block, block, block, empty, empty, empty, block, block, block],
+        [block, block, block, empty, empty, empty, block, block, block],
+        [empty, empty, empty, player2_7, empty, player2_8, empty, empty, empty],
+        [empty, player2_3, empty, player1_8, empty, empty, player2_6, empty, empty],
+        [player2_1, player1_7, player2_5, player1_5, empty, empty, empty, player2_4, empty],
+        [block, block, block, player1_3, empty, player1_6, block, block, block],
+        [block, block, block, empty, empty, player1_4, block, block, block],
+        [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
 curve([2-3, 2-4, 2-5, 3-6, 4-6, 5-6, 6-5, 6-4, 6-3, 5-2, 4-2, 3-2]).
@@ -158,12 +170,6 @@ game_cycle_wrapper(cVc, Board-Player):- set_ai_level(Level1),
                                         assert(bot_difficulty(player2, Level2)),
                                         game_cycle(cVc, Board-Player).
 
-debug(Board, Positions):- \+length(Positions, 8),
-                           write(Positions),
-                           display_game(Board).
-
-debug(_, Positions):- length(Positions, 8).
-
 % game_over(+Board:list(list(atom)), +Player:atom) 
 % Determines if the game is over for the given player.
 % The board is represented as a list of lists of atoms and the player is an atom.
@@ -175,7 +181,6 @@ game_over(Board, Player):- marbles(Player, MarblesNames),
 % Main game loop for the different game modes.
 % The game mode is an atom and the board and current player are represented as a pair (list of lists of atoms and atom).
 game_cycle(_, Board-Player):-game_over(Board, Player), !,
-                                findall(Marble-L1-C1-L2-C2, prev_move(Marble, L1-C1, L2-C2), X), write(X),
                            next_player(Player, NextPlayer),
                            congratulate(NextPlayer),
                            retractall(bot_difficulty(_, _)),
@@ -213,7 +218,6 @@ game_cycle(cVh, Board-player2):- repeat,
 game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
                                 make_move_ai(Level, Player, Board, NewBoard),
                                 evaluationScore(NewBoard, Player, Score),
-                                write(Score),nl,
                                 next_player(Player, NextPlayer),
                                 write(Player), write(' played!\n\n'),
                                 display_game(NewBoard),
