@@ -9,8 +9,9 @@ Our game doesn't require additional installation steps. To run it, it is only ne
 ## Game description
 Wana is a two player board game. Each of the players has 8 marbles at his disposal and his objective is to completely block one of the opponent's marbles. This can be done by moving your marbles, following a set of rules:
 - each player always needs to move a marble when it is his turn
-- a marble can move as far as the player wants along a line (diagonals are forbidden), but it cannot be moved through or onto another marble.
-- if the moving marble exits the board, it will reapear in the other side of the line it is moving through.
+- a marble can move as far as the player wants along a line, but it cannot be moved through or onto another marble.
+- a marble can also move along one of three curves in the board, but it cannot be moved through or onto another marble.
+- if the moving marble exits the board, it will reappear in the other side of the line it is moving through.
 
 If, in the beggining of his turn, a player has a marble that cannot be moved, then he lost the game.
 
@@ -19,7 +20,7 @@ The rules of the game can be consulted in the following website: https://boardga
 ## Game Logic
 ### Internal representation of the state of the game
 In our game, we store the current board as a list of lists. Each sublist represents an horizontal line of the board and can contain any of the following atoms:
-  - block: this board game isn't played in a rectangular board as the most games. This one is played on a board that has the shape of a cross. Therefore, to easily internally represent the board, every sublist has the same number of elements, but the sections that should be invisible to the player are marked with this atom. We could have displayed the board using lists of different sizes, but that would most likely result in bugs related to lists indexing.
+  - block: this board game isn't played in a rectangular board as the most games. This one is played on a board that has the shape of a cross. Therefore, to easily internally represent the board, every sublist has the same number of elements, but the sections that should be invisible to the player are marked with this atom.
   - empty: this atom represents that a cell is empty, which means that a marble can move through and onto it.
   - playerX_Y: this atom means that the marble Y of the player X is in that cell, therefore no other marble can move through or onto it.
 
@@ -30,7 +31,7 @@ Finally, when the game mode envolves the computer (in the role of a player), we 
 When the user executes the "play/0" predicate, the program presents a menu with the different game modes and then asks the user to select one of them (if the user inputs a number that doesn't match a valid option, then an error message appears and the user has to remake the gamemode selection). After that, if the selected game mode isn't the human vs human mode, then the user will be prompted to set the difficulty of each level of AI. Finally, the board is displayed and the user is asked to select one of his marbles and then to make a move (if the move is invalid, an error message appears and the user is prompted to redo the move).
 
 ### Moves Execution
-When the user selects a movement, the predicate "valid_move/3" is called. This predicate receives the current board, the initial position of the marble and the final one. After that, if the row index of the movement is equal in both the start position and the final position, the predicate checks if it is a valid left or right movement. If the row indexes are different but the column indexes are the same, then we know that it is a vertical movement and then we check if it is a valid upwards or downwards movement. If none of this cases apply, then the predicate fails.
+When the user selects a movement, the predicate "valid_move/3" is called. This predicate receives the current board, the initial position of the marble and the final one. After that, if the row index of the movement is equal in both the start position and the final position, the predicate checks if it is a valid left or right movement. If the row indexes are different but the column indexes are the same, then we know that it is a vertical movement and then we check if it is a valid upwards or downwards movement. If none of this cases apply, then the predicate checks if it is a valid non linear movement.
 After this verification, the actual movement of the marble is done, using the "move/5" predicate, that returns the new board.
 
 ### List of Valid Moves
@@ -39,7 +40,7 @@ We implemented two variants of this functionallity:
 - get_all_moves_from_all_pos/3: receives the current board and a list of positions in the board and returns a list of lists where each sublist contains the movements available from the corresponding positon. In other words, the i-th element of the output list corresponds to all the movements possible from the i-th position of the input list.
 
 ### End of Game
-Our game_over/2 predicate receives the current board and the player that is going to make a move and succeeds if that player lost the game. We didn't followed the project's guide in this case, because the rules of the game clearly state that the player only loses if he cannot make a move in the beggining of his turn, therefore we didn't implement the proposal done in the guide since it doesn't consider which player is currently making a move.
+Our game_over/2 predicate receives the current board and the player that is going to make a move and succeeds if that player lost the game. We didn't follow the project's guide in this case, because the rules of the game clearly state that the player only loses if he cannot make a move in the beggining of his turn, therefore we didn't implement the proposal done in the guide since it doesn't consider which player is currently making a move.
 
 ### Board Evaluation
 # @PEDRO FONSECA VERIFICA SE ESTÁ CERTO E TALVEZ É PRECISO COMPLETAR A EXPLICAÇÃO
@@ -56,7 +57,7 @@ In conclusion, the Wana board game was implemented using SICStus Prolog and offe
 
 One limitation is that the game only allows for two players and there is no option for additional players to join. Additionally, the game is text-based, which may not be as visually appealing as a graphical user interface (GUI) would be. This could potentially limit the game's appeal to some players.
 
-Possible improvements to the game include the inclusion of a GUI to make it more visually appealing and easier to play, as well as the implementation of a more advanced AI opponent with a wider range of difficulty levels. This would make the game more challenging and engaging for players.
+Possible improvements to the game include the inclusion of a GUI to make it more visually appealing and easier to play, as well as the implementation of a more advanced AI opponent with a wider range of difficulty levels as long as a more efficient method to compute the best move (in the AI mode). This would make the game more challenging and engaging for players.
 
 Overall, the implementation of the Wana board game has been successful in providing an enjoyable and challenging experience for players. However, there is still room for improvement, and further development of the game, such as the inclusion of a GUI, could enhance its appeal and usability.
 
