@@ -40,6 +40,8 @@ valid_moves([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
+% In the Wana game, the marbles can move in a non linear fashion only if the starting position and the end one are present in the same "curve" predicate.
+% The following predicates are used to instantiate the 3 available curves. 
 curve([2-3, 2-4, 2-5, 3-6, 4-6, 5-6, 6-5, 6-4, 6-3, 5-2, 4-2, 3-2]).
 curve([1-3, 1-4, 1-5, 3-7, 4-7, 5-7, 7-5, 7-4, 7-3, 5-1, 4-1, 3-1]).
 curve([0-3, 0-4, 0-5, 3-8, 4-8, 5-8, 8-5, 8-4, 8-3, 5-0, 4-0, 3-0]).
@@ -48,6 +50,7 @@ curve([0-3, 0-4, 0-5, 3-8, 4-8, 5-8, 8-5, 8-4, 8-3, 5-0, 4-0, 3-0]).
 % Initializes the size of the game board as an integer.
 size(9).
 
+% In order to forbid repeating moves in the AI vs AI mode, this predicate is used to dinamically store the previous move of each player.
 prev_move(player0, 0-0, 0-0).
 
 % player(-Player:atom)
@@ -70,7 +73,7 @@ gamemode(3, cVh).
 gamemode(4, cVc).
 
 % ai_level(+Option:integer, -Level:atom) 
-% Validates an integer as an AI level option (1 or 2).
+% Validates an integer as an AI level option (1, 2 or 3).
 % Returns the corresponding level atom.
 % Fails if the option is invalid.
 ai_level(1, easy).
@@ -86,8 +89,8 @@ next_player(player2, player1).
 % Returns a list of valid moves for a marble at a given position on the board.
 % The board is represented as a list of lists of atoms, and the position is given
 get_all_moves_from_pos(Board, Lidx_i-Cidx_i, Moves):- findall(L-C, valid_move(Board, Lidx_i-Cidx_i, L-C), Res), 
-                                             remove_dups(Res, Deduplicated),
-                                             list_del(Deduplicated, Lidx_i-Cidx_i, Moves).
+                                                      remove_dups(Res, Deduplicated),
+                                                      list_del(Deduplicated, Lidx_i-Cidx_i, Moves).
 
 % get_marble_position(+Player:atom, +Marble:atom, +Board:list(list(atom)), -Coordinates:pair(integer)) 
 % Returns the coordinates of a marble on the board.
@@ -99,14 +102,16 @@ get_marble_position(Player, Marble, Board, Line-Column):- marble_naming(Player, 
 % Makes a move on the board for a given player and marble, and returns the resulting board.
 % The board is represented as a list of lists of atoms, the player is an atom, the marble is an atom, and the coordinates are given as a pair of integers.
 % Fails if the move is not valid.
-move(Player, Marble, Board, Line-Column, NewBoard):-            atom_string(Player, PlayerString),
-                                                                atom_string_number(Marble, MarbleString),
-                                                                get_marble_position(PlayerString, MarbleString, Board, L-C),
-                                                                valid_move(Board, L-C, Line-Column),
-                                                                marble_naming(PlayerString, MarbleString, Res),
-                                                                insert_in_board(Board, Res, Line, Column, NB1),
-                                                                insert_in_board(NB1, empty, L, C, NewBoard).
+move(Player, Marble, Board, Line-Column, NewBoard):- atom_string(Player, PlayerString),
+                                                     atom_string_number(Marble, MarbleString),
+                                                     get_marble_position(PlayerString, MarbleString, Board, L-C),
+                                                     valid_move(Board, L-C, Line-Column),
+                                                     marble_naming(PlayerString, MarbleString, Res),
+                                                     insert_in_board(Board, Res, Line, Column, NB1),
+                                                     insert_in_board(NB1, empty, L, C, NewBoard).
 
+% get_all_positions(+Board:list(list(atom)), +MarblesList:list(atom), -Positions:list(pair(integer)))
+% Receives a list of marbles and transforms that list into a list of the current coordinates of each of the marble
 get_all_positions(_, [], []).
 get_all_positions(Board, [FirstMarble|Rest], Positions):- findIndexesBoard(Board, FirstMarble, L-C),
                                                           get_all_positions(Board, Rest, Res),
@@ -122,7 +127,7 @@ check_all_moves(Board, [L-C|Tail]):- get_all_moves_from_pos(Board, L-C, Res),!,
                                      check_all_moves(Board, Tail).
 
 % make_move(+Player:atom, +Board:list(list(atom)), -NewBoard:list(list(atom))) 
-% Makes a move for a given player and returns the resulting board.
+% Asks a given player a move, checks if it is a valid one and if it is, it performs the move and returns the resulting board.
 % The board is represented as a list of lists of atoms, and the player is an atom.
 make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-ColumnDest),
                                      atom_string(Player, PlayerString),
@@ -131,6 +136,8 @@ make_move(Player, Board, NewBoard):- retrieve_command(Player, Marble, LineDest-C
                                      check_valid_move(Board, L-C, LineDest-ColumnDest),
                                      move(Player, Marble, Board, LineDest-ColumnDest, NewBoard).
 
+% remove_prev_move(+Marble:atom)
+% Removes the previous move of the current player from the previous' moves list.
 remove_prev_move(Marble):- retractall(prev_move(Marble, _-_, _-_)), !.
 remove_prev_move(_).
 
@@ -138,23 +145,23 @@ remove_prev_move(_).
 % Makes a move for an AI player and returns the resulting board.
 % The difficulty level is an atom, the board is represented as a list of lists of atoms, and the player is an atom.
 make_move_ai(Difficulty, Player, Board, NewBoard):- best_move_ai(Difficulty, Board, Player, Marble, LineMove-ColumnMove),
-                                              findIndexesBoard(Board, Marble, Line-Column),
-                                              remove_prev_move(Player),
-                                              assert(prev_move(Player, Line-Column, LineMove-ColumnMove)),
-                                              insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
-                                              insert_in_board(NB1, empty, Line, Column, NewBoard).
+                                                    findIndexesBoard(Board, Marble, Line-Column),
+                                                    remove_prev_move(Player),
+                                                    assert(prev_move(Player, Line-Column, LineMove-ColumnMove)),
+                                                    insert_in_board(Board, Marble, LineMove, ColumnMove, NB1),
+                                                    insert_in_board(NB1, empty, Line, Column, NewBoard).
 
 % Main entry point of the game. Initializes the board, displays it, and starts the game with a selected game mode.
 play:- start_board(Board),
-            player(Player),
-            display_game(Board),
-            start_menu(GameMode),
-            !,
-            game_cycle_wrapper(GameMode, Board-Player).
+       player(Player),
+       display_game(Board),
+       start_menu(GameMode),
+       !,
+       game_cycle_wrapper(GameMode, Board-Player).
 
 % game_cycle_wrapper(+GameMode:atom, +Board-Player:pair(list(list(atom)), atom)) 
 % Wrapper function to handle the different game modes. Initializes AI difficulty level if needed.
-% The game mode is an atom and the board and current player are represented as a pair (list of lists of atoms and atom).
+% The game mode is an atom and the board and current player are represented as a pair (list of lists of atoms and atom, respectively).
 game_cycle_wrapper(hVh, Board-Player):- game_cycle(hVh, Board-Player).
 game_cycle_wrapper(cVh, Board-Player):- set_ai_level(Level),
                                         assert(bot_difficulty(player1, Level)),
@@ -181,17 +188,17 @@ game_over(Board, Player):- marbles(Player, MarblesNames),
 % Main game loop for the different game modes.
 % The game mode is an atom and the board and current player are represented as a pair (list of lists of atoms and atom).
 game_cycle(_, Board-Player):-game_over(Board, Player), !,
-                           next_player(Player, NextPlayer),
-                           congratulate(NextPlayer),
-                           retractall(bot_difficulty(_, _)),
-                           retractall(prev_move(_, _-_, _-_)),
-                           assert(prev_move(player0_0, 0-0, 0-0)).
+                             next_player(Player, NextPlayer),
+                             congratulate(NextPlayer),
+                             retractall(bot_difficulty(_, _)),
+                             retractall(prev_move(_, _-_, _-_)),
+                             assert(prev_move(player0_0, 0-0, 0-0)).
 
 game_cycle(hVh, Board-Player):- repeat,
-                           make_move(Player, Board, NewBoard),
-                           next_player(Player, NextPlayer),
-                           display_game(NewBoard),
-                           game_cycle(hVh, NewBoard-NextPlayer).
+                                make_move(Player, Board, NewBoard),
+                                next_player(Player, NextPlayer),
+                                display_game(NewBoard),
+                                game_cycle(hVh, NewBoard-NextPlayer).
 
 game_cycle(hVc, Board-player1):- repeat,
                                  make_move(player1, Board, NewBoard),
@@ -222,4 +229,3 @@ game_cycle(cVc, Board-Player):- bot_difficulty(Player, Level),
                                 write(Player), write(' played!\n\n'),
                                 display_game(NewBoard),
                                 game_cycle(cVc, NewBoard-NextPlayer).
-
