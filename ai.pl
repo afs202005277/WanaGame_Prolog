@@ -62,13 +62,13 @@ depthMinimaxCalls([], _, _, _, []).
 
 depthMinimaxCalls([A|Rest], Player, Depth, 1, NewBoards):-      next_player(Player, OppPlayer),
                                                                 minimax(A, OppPlayer, Depth, 0, M, LM-CM, _),
-                                                                atom_concat(MPlayer, N, M), atom_length(N, 1), atom_codes(N, TmpNumber), MarbleID is TmpNumber-48,
+                                                                atom_concat(_, N, M), atom_length(N, 1), atom_codes(N, TmpNumber), MarbleID is TmpNumber-48,
                                                                 move(OppPlayer, MarbleID, A, LM-CM, NB),
                                                                 depthMinimaxCalls(Rest, Player, Depth, 1, TmpNewBoards),
                                                                 append([NB], TmpNewBoards, NewBoards).
 
 depthMinimaxCalls([A|Rest], Player, Depth, 0, NewBoards):-      minimax(A, Player, Depth, 0, M, LM-CM, _),
-                                                                atom_concat(MPlayer, N, M), atom_length(N, 1), atom_codes(N, TmpNumber), MarbleID is TmpNumber-48,
+                                                                atom_concat(_, N, M), atom_length(N, 1), atom_codes(N, TmpNumber), MarbleID is TmpNumber-48,
                                                                 move(Player, MarbleID, A, LM-CM, NB),
                                                                 depthMinimaxCalls(Rest, Player, Depth, 0, TmpNewBoards),
                                                                 append([NB], TmpNewBoards, NewBoards).
@@ -82,6 +82,22 @@ sublistDepthMinimaxCalls([A|Rest], Player, Depth, 1, NextMoveBoards):-      dept
 sublistDepthMinimaxCalls([A|Rest], Player, Depth, 0, NextMoveBoards):-      depthMinimaxCalls(A, Player, Depth, 0, Boards),
                                                                             sublistDepthMinimaxCalls(Rest, Player, Depth, 0, TmpNextMoveBoards),
                                                                             append([Boards], TmpNextMoveBoards, NextMoveBoards).
+
+% Auxiliary 'map' function that works with multidimensional arrays
+mapDoubleList(_, [], []).
+mapDoubleList(Pred, [H|T], [M|Ms]) :-
+    call(Pred, H, M, _),
+    mapDoubleList(Pred, T, Ms).
+
+% Auxiliary function that gets the index of the list that has the maximum value
+max_list_index(Lists, Index) :-
+    mapDoubleList(max_list, Lists, Maxes),
+    max_list(Maxes, _, Index).
+
+% Auxiliary function that gets the index of the list that has the minimum value
+min_list_index(Lists, Index) :-
+    mapDoubleList(min_list, Lists, Mins),
+    max_list(Mins, _, Index).
 
 % Minimax algorithm, receives the current board, the player, the depth and if it is the current's player turn and returns the best move possible.
 minimax(Board, Player, 0, 0, Marble, LineMove-ColumnMove, Score):-      marbles(Player, MarblesPlayer),
@@ -109,23 +125,6 @@ minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      next_pla
                                                                         nth0(I, Is, TmpI),
                                                                         nth0(I, MovesOpponentPlayer, TmpMoves),
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
-
-% Auxiliary 'map' function that works with multidimensional arrays
-mapDoubleList(_, [], []).
-mapDoubleList(Pred, [H|T], [M|Ms]) :-
-    call(Pred, H, M, _),
-    mapDoubleList(Pred, T, Ms).
-
-% Auxiliary function that gets the index of the list that has the maximum value
-max_list_index(Lists, Index) :-
-    mapDoubleList(max_list, Lists, Maxes),
-    max_list(Maxes, Max, Index).
-
-% Auxiliary function that gets the index of the list that has the minimum value
-min_list_index(Lists, Index) :-
-    mapDoubleList(min_list, Lists, Mins),
-    max_list(Mins, Min, Index).
-
 
 minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
