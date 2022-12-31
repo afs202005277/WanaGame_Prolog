@@ -13,7 +13,7 @@ Wana is a two player board game. Each of the players has 8 marbles at his dispos
 - a marble can also move along one of three curves in the board, but it cannot be moved through or onto another marble.
 - if the moving marble exits the board, it will reappear in the other side of the line it is moving through.
 
-The possible non linear movements are depicted in the following image:
+The possible non linear movements (green, yellow and blue) are depicted in the following image:
 ![NonLinear](./curves.png)
 
 If, in the beggining of his turn, a player has a marble that cannot be moved, then he lost the game.
