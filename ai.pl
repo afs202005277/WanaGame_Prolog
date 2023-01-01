@@ -133,6 +133,24 @@ minimax(Board, Player, 0, 1, Marble, LineMove-ColumnMove, Score):-      next_pla
                                                                         nth0(I, MovesOpponentPlayer, TmpMoves),
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
 
+
+list_game_over([A|_], Player, 0):- next_player(Player, OppPlayer), game_over(A, OppPlayer), !.
+list_game_over([_|Rest], Player, X):- list_game_over(Rest, Player, X1), !, X is X1+1.
+
+sublist_game_over([A|_], Player, 0, X):- list_game_over(A, Player, X).
+sublist_game_over([_|Rest], Player, Y, X):- sublist_game_over(Rest, Player, Y1, X), !, Y is Y1+1.
+
+
+minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
+                                                                        get_all_positions(Board, MarblesPlayer, PositionsPlayer),
+                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
+                                                                        all_boards(Board, Player, MarblesPlayer, MP, NewBoards),
+                                                                        sublist_game_over(NewBoards, Player, Y, X),
+                                                                        nth0(Y, MP, MarbleListMoves),
+                                                                        nth0(Y, MarblesPlayer, Marble),
+                                                                        nth0(X, MarbleListMoves, LineMove-ColumnMove),
+                                                                        Score is 10000000.
+
 minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
                                                                         get_all_positions(Board, MarblesPlayer, PositionsPlayer),
                                                                         get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
@@ -146,6 +164,16 @@ minimax(Board, Player, Depth, 0, Marble, LineMove-ColumnMove, Score):-  marbles(
                                                                         nth0(I, Is, TmpI),
                                                                         nth0(I, MovesPlayer, TmpMoves),
                                                                         nth0(TmpI, TmpMoves, LineMove-ColumnMove).
+
+minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  marbles(Player, MarblesPlayer),
+                                                                        get_all_positions(Board, MarblesPlayer, PositionsPlayer),
+                                                                        get_all_moves_from_all_pos(Board, PositionsPlayer, MP),
+                                                                        all_boards(Board, Player, MarblesPlayer, MP, NewBoards),
+                                                                        sublist_game_over(NewBoards, Player, Y, X),
+                                                                        nth0(Y, MP, MarbleListMoves),
+                                                                        nth0(Y, MarblesPlayer, Marble),
+                                                                        nth0(X, MarbleListMoves, LineMove-ColumnMove),
+                                                                        Score is -1000.
 
 minimax(Board, Player, Depth, 1, Marble, LineMove-ColumnMove, Score):-  next_player(Player, OpponentPlayer),
                                                                         marbles(OpponentPlayer, MarblesOpponentPlayer),

@@ -40,6 +40,18 @@ valid_moves([
         [block, block, block, player1_1, empty, player1_2, block, block, block]
         ]).
 
+test_board([
+        [block, block, block, empty, empty, player2_2, block, block, block],
+        [block, block, block, empty, empty, empty, block, block, block],
+        [block, block, block, empty, player2_5, empty, block, block, block],
+        [empty, player1_3, empty, player2_7, empty, player2_8, empty, empty, player1_2],
+        [player1_1, player2_1, player1_5, empty, empty, player1_8, player2_6, empty, empty],
+        [empty, empty, empty, player1_7, empty, empty, empty, player2_4, empty],
+        [block, block, block, empty, player1_6, empty, block, block, block],
+        [block, block, block, empty, empty, player1_4, block, block, block],
+        [block, block, block, player2_3, empty, empty, block, block, block]
+        ]).
+
 % In the Wana game, the marbles can move in a non linear fashion only if the starting position and the end one are present in the same "curve" predicate.
 % The following predicates are used to instantiate the 3 available curves. 
 curve([2-3, 2-4, 2-5, 3-6, 4-6, 5-6, 6-5, 6-4, 6-3, 5-2, 4-2, 3-2]).
