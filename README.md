@@ -1,5 +1,5 @@
 # Implementation of the Wana board game
- Group: Wana_1
+ Group: **Wana_1**
  - André Filipe Garcez Moreira de Sousa (up202005277): 50%
  - Pedro Luís Jerónimo Martins Guimarães Fonseca (up202008307): 50%
 
@@ -13,7 +13,7 @@ Wana is a two player board game. Each of the players has 8 marbles at his dispos
 - a marble can also move along one of three curves in the board, but it cannot be moved through or onto another marble.
 - if the moving marble exits the board, it will reappear in the other side of the line it is moving through.
 
-The possible non linear movements (green, yellow and blue) are depicted in the following image:
+The possible non linear movements (green, blue and yellow) are depicted in the following image:
 ![NonLinear](./images/curves.png)
 
 If, in the beggining of his turn, a player has a marble that cannot be moved, then he lost the game.
@@ -24,7 +24,7 @@ The rules of the game can be consulted in the following website: https://boardga
 ### Internal representation of the state of the game
 In our game, we store the current board as a list of lists. Each sublist represents an horizontal line of the board and can contain any of the following atoms:
   - block: this board game isn't played in a rectangular board as the most games. This one is played on a board that has the shape of a cross. Therefore, to easily internally represent the board, every sublist has the same number of elements, but the sections that should be invisible to the player are marked with this atom.
-  - empty: this atom represents that a cell is empty, which means that a marble can move through and onto it.
+  - empty: this atom represents that a cell is empty, which means that a marble can move through or onto it.
   - playerX_Y: this atom means that the marble Y of the player X is in that cell, therefore no other marble can move through or onto it.
 
 Moreover, the first player is set by using the "player/1" predicate and switching players' turns is done using the next_player/2 predicate.
@@ -38,6 +38,7 @@ When the user executes the "play/0" predicate, the program presents a menu with 
 ### Moves Execution
 When the user selects a movement, the predicate "valid_move/3" is called. This predicate receives the current board, the initial position of the marble and the final one. After that, if the row index of the movement is equal in both the start position and the final position, the predicate checks if it is a valid left or right movement. If the row indexes are different but the column indexes are the same, then we know that it is a vertical movement and then we check if it is a valid upwards or downwards movement. If none of this cases apply, then the predicate checks if it is a valid non linear movement.
 After this verification, the actual movement of the marble is done, using the "move/5" predicate, that returns the new board.
+For the AI component of this project, we were forced to add a new rule to the game: a non-human player is not able to make repeating moves. In other words, if the previous move of a non human player was moving a marble from position X-Y to W-Z, then he is not allowed to move a marble from W-Z to X-Y, in the present moment. This was introduced to remove infinite loops when the AI were playing against each other.
 
 ### List of Valid Moves
 We implemented two variants of this functionallity: 
@@ -50,7 +51,7 @@ Our game_over/2 predicate receives the current board and the player that is goin
 ![End Screen](./images/EndScreen.png)
 
 ### Board Evaluation
-Our evaluation predicate goes through each marble of the player and calculates the number of possible moves of each marble. The same is then done for the opponent. The final score is the sum of all of the player's moves minus the sum of all the opponent's moves. Our reasoning behind this score has to do with the game's goal: trap the other player's marbles; so by checking the amount of available moves we are guaranteeing the freedom of the player and therefore making sure that he is not being trapped in comparison with the other player.
+Our evaluation predicate goes through each marble of the player and calculates the number of possible moves of each marble. The same is then done for the opponent. The final score is the sum of all of the player's moves minus the sum of all the opponent's moves. Our reasoning behind this score has to do with the game's goal: trap the other player's marbles; so by checking the amount of available moves we are guaranteeing the freedom of the player and therefore making sure that he is not being trapped in comparison with the other player. Furthermore, if a game over event is detected, then the score of that move is incredibly high or low, depending on the function's current goal.
 
 ### Computer Move
 In our game, we implemented three difficulty levels:
