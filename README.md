@@ -42,7 +42,6 @@ We implemented two variants of this functionallity:
 Our game_over/2 predicate receives the current board and the player that is going to make a move and succeeds if that player lost the game. We didn't followed the project's guide in this case, because the rules of the game clearly state that the player only loses if he cannot make a move in the beggining of his turn, therefore we didn't implement the proposal done in the guide since it doesn't consider which player is currently making a move.
 
 ### Board Evaluation
-# @PEDRO FONSECA VERIFICA SE ESTÁ CERTO E TALVEZ É PRECISO COMPLETAR A EXPLICAÇÃO
 Our evaluation predicate goes through each marble of the player and calculates the number of possible moves of each marble. The final score is the sum of all of these moves.
 
 ### Computer Move
